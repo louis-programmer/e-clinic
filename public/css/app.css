@@ -1,0 +1,257 @@
+
+/* =========================
+   DESIGN SYSTEM (THEME TOKENS)
+========================= */
+:root {
+    --primary: #1e293b;
+    --secondary: #334155;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #3b82f6;
+    --border: #e2e8f0;
+}
+
+
+/* =========================
+   BASE RESET
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background: var(--background);
+    color: var(--text);
+}
+
+/* =========================
+   LAYOUT SYSTEM (OLD + NEW COMPATIBLE)
+========================= */
+.sidebar,
+.app-sidebar {
+    width: 240px;
+    height: 100vh;
+    background: var(--primary);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h2,
+.app-sidebar-brand {
+    color: white;
+    padding: 20px;
+    font-size: 18px;
+    margin: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Sidebar navigation */
+.sidebar a,
+.nav-item {
+    padding: 12px 14px;
+    margin: 4px 10px;
+    border-radius: 8px;
+    color: #cbd5f5;
+    text-decoration: none;
+    transition: 0.2s ease;
+    display: block;
+}
+
+.sidebar a:hover,
+.nav-item:hover {
+    background: var(--secondary);
+    color: white;
+}
+
+.sidebar a.active,
+.nav-item.active {
+    background: var(--accent);
+    color: white;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+.topbar,
+.app-topbar {
+    margin-left: 240px;
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.app-topbar-title {
+    font-size: 14px;
+    color: var(--text);
+}
+
+.app-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-name {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+.content,
+.app-content {
+    margin-left: 240px;
+    padding: 25px;
+}
+
+/* =========================
+   CARDS (MODERN SaaS STYLE)
+========================= */
+.card {
+    background: var(--card-bg);
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.04),
+        0 8px 20px rgba(0,0,0,0.05);
+
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.06),
+        0 12px 28px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.card p {
+    font-size: 26px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+h1 {
+    margin-top: 0;
+    font-size: 22px;
+}
+
+/* =========================
+   BUTTON SYSTEM
+========================= */
+.btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-primary {
+    width: 100%;
+}
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+}
+
+.btn-logout:hover {
+    background: #f1f5f9;
+}
+
+/* =========================
+   FORMS (SCOPED SYSTEM)
+========================= */
+.form-input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    color: var(--text);
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+}
+
+.form-input:hover {
+    border-color: #cbd5e1;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+/* =========================
+   AUTH SYSTEM
+========================= */
+.auth-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card {
+    width: 360px;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.auth-title {
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 20px;
+}
+
+.auth-error {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
