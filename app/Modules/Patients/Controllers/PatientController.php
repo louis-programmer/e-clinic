@@ -32,7 +32,9 @@ class PatientController extends Controller
 
     public function show($id)
     {
-        $patient = Patient::with('encounters')->findOrFail($id);
+        $patient = Patient::with(['encounters' => function ($query) {
+            $query->orderBy('encounter_date', 'desc');
+        }])->findOrFail($id);
 
         return view('patients.show', compact('patient'));
     }

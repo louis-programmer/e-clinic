@@ -4,30 +4,50 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Encounter;
-use App\Models\Patient;
+use App\Modules\Patients\Models\Patient;
 
 class EncounterController extends Controller
 {
     public function store(Request $request, $patientId)
     {
-        // 1. Ensure patient exists (VERY IMPORTANT in EMR)
         $patient = Patient::findOrFail($patientId);
 
-        // 2. Validate input
         $validated = $request->validate([
-            'chief_complaint' => 'nullable|string',
+            'chief_complaint' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
-            'diagnosis' => 'nullable|string',
+            'diagnosis' => 'nullable|string|max:255',
+            'encounter_date' => 'nullable|date',
         ]);
 
-        // 3. Attach patient
         $validated['patient_id'] = $patient->id;
 
-        // 4. Create encounter
         Encounter::create($validated);
 
-        // 5. Better UX: go back to patient profile
-        return redirect("/patients/{$patient->id}")
+        return redirect()->route('patients.show', $patient->id)
             ->with('success', 'Encounter added successfully');
+    }
+
+    public function edit($id)
+    {
+        $encounter = Encounter::findOrFail($id);
+
+        return view('encounters.edit', compact('encounter'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $encounter = Encounter::findOrFail($id);
+
+        $validated = $request->validate([
+            'chief_complaint' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'diagnosis' => 'nullable|string|max:255',
+            'encounter_date' => 'nullable|date',
+        ]);
+
+        $encounter->update($validated);
+
+        return redirect()->route('patients.show', $encounter->patient_id)
+            ->with('success', 'Encounter updated successfully');
     }
 }

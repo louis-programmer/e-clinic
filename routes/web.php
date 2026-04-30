@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Modules\Patients\Controllers\PatientController;
-    use App\Http\Controllers\EncounterController;
+use App\Http\Controllers\EncounterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,33 +21,37 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware('auth')->group(function () {
 
-    // Dashboard
-    Route::get('/', function () {
-        return view('dashboard');
-    });
+    Route::get('/', fn() => view('dashboard'))->name('dashboard');
 
-    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     /*
     |--------------------------------------------------------------------------
-    | Patients Module
+    | Patients
     |--------------------------------------------------------------------------
     */
     Route::prefix('patients')->group(function () {
 
-        Route::get('/', [PatientController::class, 'index']);
-        Route::get('/create', [PatientController::class, 'create']);
-        Route::post('/', [PatientController::class, 'store']);
+        Route::get('/', [PatientController::class, 'index'])->name('patients.index');
+        Route::get('/create', [PatientController::class, 'create'])->name('patients.create');
+        Route::post('/', [PatientController::class, 'store'])->name('patients.store');
 
-        Route::get('/{id}', [PatientController::class, 'show']);
-        Route::get('/{id}/edit', [PatientController::class, 'edit']);
-        Route::put('/{id}', [PatientController::class, 'update']);
+        Route::get('/{patient}', [PatientController::class, 'show'])->name('patients.show');
+        Route::get('/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
+        Route::put('/{patient}', [PatientController::class, 'update'])->name('patients.update');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Encounters
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('encounters')->group(function () {
 
+        Route::post('/patients/{patient}', [EncounterController::class, 'store'])->name('encounters.store');
 
-
-    Route::post('/patients/{id}/encounters', [EncounterController::class, 'store']);
+        Route::get('/{encounter}/edit', [EncounterController::class, 'edit'])->name('encounters.edit');
+        Route::put('/{encounter}', [EncounterController::class, 'update'])->name('encounters.update');
+    });
 
 });
