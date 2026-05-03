@@ -7,7 +7,14 @@
     <h1>{{ $patient->first_name }} {{ $patient->last_name }}</h1>
     <p class="text-muted">Patient Profile</p>
 
-    <a href="/patients/{{ $patient->id }}/edit" class="btn">Edit</a>
+  
+
+    @auth
+    @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
+          <a href="/patients/{{ $patient->id }}/edit" class="btn">Edit</a>
+    @endif
+@endauth
+
 </div>
 
 <!-- BASIC INFO -->

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Modules\Patients\Controllers\PatientController;
 use App\Http\Controllers\EncounterController;
+use App\Http\Controllers\ScanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,5 +54,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/{encounter}/edit', [EncounterController::class, 'edit'])->name('encounters.edit');
         Route::put('/{encounter}', [EncounterController::class, 'update'])->name('encounters.update');
     });
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scan
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('scan')->group(function () {
+        Route::get('/', [ScanController::class, 'index'])->name('scan.index');
+        Route::post('/', [ScanController::class, 'store'])->name('scan.store');
+    });
+
 
 });

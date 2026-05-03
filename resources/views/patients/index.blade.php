@@ -4,13 +4,20 @@
 <div class="card">
     <h1>Patients</h1>
 
+@auth
+    @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
+        <a href="/patients/create">Add Patient</a>
+    @endif
+@endauth
 
+
+<!--
 @auth
     @if(auth()->user()->hasRole('admin'))
         <a href="/patients/create" class="btn">Add Patient</a>
     @endif
 @endauth
-
+-->
     <br><br>
 
     @foreach ($patients as $patient)

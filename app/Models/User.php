@@ -64,6 +64,12 @@ class User extends Authenticatable
             ->exists();
     }
 
-
+//instead of repeating everywhere:@if(auth()->check() && auth()->user()->hasRole('admin'))
+    public function hasAnyRole(...$roles)
+    {
+        return $this->roles()
+            ->whereIn('name', $roles)
+            ->exists();
+    }
 
 }

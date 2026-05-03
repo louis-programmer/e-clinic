@@ -20,6 +20,7 @@ class Patient extends Model
         'address',
     ];
 
+
     protected $casts = [
         'birthdate' => 'date',
     ];
@@ -33,6 +34,7 @@ class Patient extends Model
     public function getFullNameAttribute()
     {
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
+        
     }
 
     public function getAgeAttribute()

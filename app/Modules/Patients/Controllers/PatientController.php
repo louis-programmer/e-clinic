@@ -5,9 +5,24 @@ namespace App\Modules\Patients\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modules\Patients\Models\Patient;
+use Illuminate\Support\Str;
+
 
 class PatientController extends Controller
 {
+
+    public function __construct()
+        {
+            $this->middleware('auth');
+
+            $this->middleware('role:' . implode(',', config('roles.patient_view')))
+                ->only(['index', 'show']);
+
+            $this->middleware('role:' . implode(',', config('roles.patient_manage')))
+                ->only(['create', 'store', 'edit', 'update']);
+        }
+
+
     public function index()
     {
         $patients = Patient::latest()->paginate(10);
@@ -24,7 +39,10 @@ class PatientController extends Controller
     {
         $validated = $this->validatePatient($request);
 
-        $patient = Patient::create($validated);
+        #$validated['patient_code'] = Str::uuid(); // or custom format
+        $validated['patient_code'] = (string) Str::uuid();
+
+        $patient = Patient::create($validated);      
 
         return redirect('/patients/' . $patient->id)
             ->with('success', 'Patient created successfully');
@@ -84,17 +102,11 @@ class PatientController extends Controller
         ]);
     }
 
-        public function __construct()
-        {
-            $this->middleware('auth');
-
-            // Only admin + staff can view patients list
-            $this->middleware('role:admin,staff')->only(['index']);
-
-            // Only admin can create/update
-            $this->middleware('role:admin')->only(['create', 'store', 'edit', 'update']);
-        }
-
         
+          
+
+
+          ////
+
 
 }
