@@ -83,4 +83,18 @@ class PatientController extends Controller
             'birthdate' => $required . '|date',
         ]);
     }
+
+        public function __construct()
+        {
+            $this->middleware('auth');
+
+            // Only admin + staff can view patients list
+            $this->middleware('role:admin,staff')->only(['index']);
+
+            // Only admin can create/update
+            $this->middleware('role:admin')->only(['create', 'store', 'edit', 'update']);
+        }
+
+        
+
 }

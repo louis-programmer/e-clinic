@@ -4,7 +4,12 @@
 <div class="card">
     <h1>Patients</h1>
 
-    <a href="/patients/create" class="btn">Add Patient</a>
+
+@auth
+    @if(auth()->user()->hasRole('admin'))
+        <a href="/patients/create" class="btn">Add Patient</a>
+    @endif
+@endauth
 
     <br><br>
 
