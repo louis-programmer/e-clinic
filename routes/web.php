@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Modules\Patients\Controllers\PatientController;
 use App\Http\Controllers\EncounterController;
 use App\Http\Controllers\ScanController;
+use App\Modules\Patients\Controllers\PatientImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/{patient}', [PatientController::class, 'show'])->name('patients.show');
         Route::get('/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
         Route::put('/{patient}', [PatientController::class, 'update'])->name('patients.update');
+
+        Route::post('/{patient}/images', [PatientImageController::class, 'store'])
+             ->name('patients.images.store');
+
     });
 
     /*

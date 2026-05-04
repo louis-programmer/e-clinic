@@ -3,6 +3,7 @@
 namespace App\Modules\Patients\Models;
 use App\Models\Encounter;
 use Illuminate\Database\Eloquent\Model;
+use App\Modules\Patients\Models\PatientImage;
 
 class Patient extends Model
 {
@@ -49,6 +50,11 @@ class Patient extends Model
         return $this->hasMany(Encounter::class);
     }
 
+
+        public function images()
+        {
+            return $this->hasMany(PatientImage::class);
+        }
 
 
 }

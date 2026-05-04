@@ -1,21 +1,64 @@
 @extends('layouts.app')
 
 @section('content')
-
+<!-- before -->
 <!-- PATIENT HEADER -->
 <div class="card">
+
     <h1>{{ $patient->first_name }} {{ $patient->last_name }}</h1>
     <p class="text-muted">Patient Profile</p>
 
-  
-
+    {{-- EDIT BUTTON --}}
     @auth
-    @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
-          <a href="/patients/{{ $patient->id }}/edit" class="btn">Edit</a>
-    @endif
-@endauth
+        @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
+            <a href="/patients/{{ $patient->id }}/edit" class="btn">Edit</a>
+        @endif
+    @endauth
 
-</div>
+
+    <hr>
+
+        @if(session('success'))
+            <div style="color: green;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div style="color: red;">
+                {{ session('error') }}
+            </div>
+        @endif
+
+    {{-- UPLOAD FORM --}}
+    @auth
+        @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
+            <form action="{{ route('patients.images.store', $patient->id) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+                @csrf
+
+                <input type="file" name="image" accept="image/*">
+                <button type="submit">Upload Image</button>
+            </form>
+        @endif
+    @endauth
+
+    <h3>Patient Images</h3>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            @forelse($patient->images ?? [] as $image)
+                <div style="width:150px; height:150px; overflow:hidden; border-radius:8px; cursor:pointer;">
+                    <img
+                        src="{{ asset('storage/' . $image->file_path) }}"
+                        style="width:100%; height:100%; object-fit:cover;"
+                        onclick="openModal(this.src)"
+                    >
+                </div>
+            @empty
+                <p>No images uploaded yet.</p>
+            @endforelse
+        </div>
 
 <!-- BASIC INFO -->
 <div class="card" style="margin-top:15px;">
@@ -113,3 +156,36 @@
 </div>
 
 @endsection
+
+
+<script>
+    function openModal(src) {
+        document.getElementById('imageModal').style.display = 'flex';
+        document.getElementById('modalImage').src = src;
+    }
+
+    function closeModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
+</script>
+
+
+<!-- IMAGE MODAL -->
+<div id="imageModal"
+     style="display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.8);
+            justify-content:center;
+            align-items:center;
+            z-index:9999;"
+     onclick="closeModal()">
+
+    <img id="modalImage"
+         style="max-width:90%;
+                max-height:90%;
+                border-radius:10px;">
+</div>
