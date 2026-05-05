@@ -45,6 +45,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/{patient}/images', [PatientImageController::class, 'store'])
              ->name('patients.images.store');
 
+        Route::delete('/images/{image}', [PatientImageController::class, 'destroy'])
+        ->name('patients.images.destroy'); /// delete image
+
     });
 
     /*

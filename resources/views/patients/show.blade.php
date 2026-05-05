@@ -44,21 +44,51 @@
         @endif
     @endauth
 
-    <h3>Patient Images</h3>
+   <h3>Patient Images</h3>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            @forelse($patient->images ?? [] as $image)
-                <div style="width:150px; height:150px; overflow:hidden; border-radius:8px; cursor:pointer;">
-                    <img
-                        src="{{ asset('storage/' . $image->file_path) }}"
-                        style="width:100%; height:100%; object-fit:cover;"
-                        onclick="openModal(this.src)"
-                    >
-                </div>
-            @empty
-                <p>No images uploaded yet.</p>
-            @endforelse
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+    @forelse($patient->images ?? [] as $image)
+
+        <div style="position:relative; width:150px; height:150px;">
+
+            <!-- IMAGE -->
+            <img
+                src="{{ asset('storage/' . $image->file_path) }}"
+                style="width:100%; height:100%; object-fit:cover; border-radius:8px; cursor:pointer;"
+                onclick="openModal(this.src)"
+            >
+
+            <!-- DELETE BUTTON -->
+            @auth
+            @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
+                <form method="POST"
+                      action="{{ route('patients.images.destroy', $image->id) }}"
+                      style="position:absolute; top:5px; right:5px;">
+                    @csrf
+                    @method('DELETE')
+
+                    <button type="submit"
+                            onclick="return confirm('Delete this image?')"
+                            style="
+                                background:red;
+                                color:white;
+                                border:none;
+                                padding:4px 6px;
+                                border-radius:5px;
+                                cursor:pointer;
+                            ">
+                        ✕
+                    </button>
+                </form>
+            @endif
+            @endauth
+
         </div>
+
+    @empty
+        <p>No images uploaded yet.</p>
+    @endforelse
+</div>
 
 <!-- BASIC INFO -->
 <div class="card" style="margin-top:15px;">
