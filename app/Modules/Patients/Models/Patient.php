@@ -4,6 +4,8 @@ namespace App\Modules\Patients\Models;
 use App\Models\Encounter;
 use Illuminate\Database\Eloquent\Model;
 use App\Modules\Patients\Models\PatientImage;
+#use App\Models\Appointment;
+use App\Modules\Patients\Models\Appointment;
 
 class Patient extends Model
 {
@@ -54,6 +56,13 @@ class Patient extends Model
         public function images()
         {
             return $this->hasMany(PatientImage::class);
+        }
+
+
+        public function appointments()
+        {
+            return $this->hasMany(Appointment::class)
+                ->orderBy('appointment_date', 'desc');
         }
 
 

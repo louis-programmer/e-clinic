@@ -5,6 +5,8 @@ use App\Modules\Patients\Controllers\PatientController;
 use App\Http\Controllers\EncounterController;
 use App\Http\Controllers\ScanController;
 use App\Modules\Patients\Controllers\PatientImageController;
+use App\Http\Controllers\AppointmentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +49,9 @@ Route::middleware('auth')->group(function () {
 
         Route::delete('/images/{image}', [PatientImageController::class, 'destroy'])
         ->name('patients.images.destroy'); /// delete image
+
+        Route::post('/{patient}/appointments', [AppointmentController::class, 'store'])
+        ->name('appointments.store'); // appointments
 
     });
 
