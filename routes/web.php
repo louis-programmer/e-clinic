@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Modules\Patients\Controllers\PatientController;
 use App\Http\Controllers\EncounterController;
 use App\Http\Controllers\ScanController;
-use App\Modules\Patients\Controllers\PatientImageController;
 use App\Http\Controllers\AppointmentController;
 
+use App\Modules\Patients\Controllers\PatientController;
+use App\Modules\Patients\Controllers\PatientImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +14,13 @@ use App\Http\Controllers\AppointmentController;
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+
+    Route::get('/login', [AuthController::class, 'showLogin'])
+        ->name('login');
+
     Route::post('/login', [AuthController::class, 'login']);
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +29,17 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', fn() => view('dashboard'))->name('dashboard');
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/', fn () => view('dashboard'))
+        ->name('dashboard');
 
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+
 
     /*
     |--------------------------------------------------------------------------
@@ -36,24 +48,66 @@ Route::middleware('auth')->group(function () {
     */
     Route::prefix('patients')->group(function () {
 
-        Route::get('/', [PatientController::class, 'index'])->name('patients.index');
-        Route::get('/create', [PatientController::class, 'create'])->name('patients.create');
-        Route::post('/', [PatientController::class, 'store'])->name('patients.store');
+        Route::get('/', [PatientController::class, 'index'])
+            ->name('patients.index');
 
-        Route::get('/{patient}', [PatientController::class, 'show'])->name('patients.show');
-        Route::get('/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
-        Route::put('/{patient}', [PatientController::class, 'update'])->name('patients.update');
+        Route::get('/create', [PatientController::class, 'create'])
+            ->name('patients.create');
 
+        Route::post('/', [PatientController::class, 'store'])
+            ->name('patients.store');
+
+        Route::get('/{patient}', [PatientController::class, 'show'])
+            ->name('patients.show');
+
+        Route::get('/{patient}/edit', [PatientController::class, 'edit'])
+            ->name('patients.edit');
+
+        Route::put('/{patient}', [PatientController::class, 'update'])
+            ->name('patients.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Patient Images
+        |--------------------------------------------------------------------------
+        */
         Route::post('/{patient}/images', [PatientImageController::class, 'store'])
-             ->name('patients.images.store');
+            ->name('patients.images.store');
 
         Route::delete('/images/{image}', [PatientImageController::class, 'destroy'])
-        ->name('patients.images.destroy'); /// delete image
+            ->name('patients.images.destroy');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Patient Appointments
+        |--------------------------------------------------------------------------
+        */
         Route::post('/{patient}/appointments', [AppointmentController::class, 'store'])
-        ->name('appointments.store'); // appointments
-
+            ->name('appointments.store');
     });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Appointment Actions
+    |--------------------------------------------------------------------------
+    */
+ Route::prefix('appointments')->group(function () {
+
+    Route::post('{appointment}/no-show', [AppointmentController::class, 'noShow'])
+        ->name('appointments.no-show');
+
+    Route::post('{appointment}/cancel', [AppointmentController::class, 'cancel'])
+        ->name('appointments.cancel');
+
+    Route::post('{appointment}/complete', [AppointmentController::class, 'complete'])
+        ->name('appointments.complete');
+
+    Route::post('{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
+        ->name('appointments.reschedule');
+});
 
     /*
     |--------------------------------------------------------------------------
@@ -62,12 +116,15 @@ Route::middleware('auth')->group(function () {
     */
     Route::prefix('encounters')->group(function () {
 
-        Route::post('/patients/{patient}', [EncounterController::class, 'store'])->name('encounters.store');
+        Route::post('/patients/{patient}', [EncounterController::class, 'store'])
+            ->name('encounters.store');
 
-        Route::get('/{encounter}/edit', [EncounterController::class, 'edit'])->name('encounters.edit');
-        Route::put('/{encounter}', [EncounterController::class, 'update'])->name('encounters.update');
+        Route::get('/{encounter}/edit', [EncounterController::class, 'edit'])
+            ->name('encounters.edit');
+
+        Route::put('/{encounter}', [EncounterController::class, 'update'])
+            ->name('encounters.update');
     });
-
 
 
     /*
@@ -76,9 +133,12 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('scan')->group(function () {
-        Route::get('/', [ScanController::class, 'index'])->name('scan.index');
-        Route::post('/', [ScanController::class, 'store'])->name('scan.store');
-    });
 
+        Route::get('/', [ScanController::class, 'index'])
+            ->name('scan.index');
+
+        Route::post('/', [ScanController::class, 'store'])
+            ->name('scan.store');
+    });
 
 });

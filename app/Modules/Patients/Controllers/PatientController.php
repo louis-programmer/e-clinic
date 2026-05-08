@@ -30,6 +30,8 @@ class PatientController extends Controller
         return view('patients.index', compact('patients'));
     }
 
+
+
     public function create()
     {
         return view('patients.create');
@@ -48,15 +50,26 @@ class PatientController extends Controller
             ->with('success', 'Patient created successfully');
     }
 
-    public function show($id)
+    public function show(Patient $patient)
     {
-        $patient = Patient::with(['encounters' => function ($query) {
-            $query->orderBy('encounter_date', 'desc');
-        }])->findOrFail($id);
+        $patient->load([
+            'encounters',
+            'images',
+        ]);
 
-        return view('patients.show', compact('patient'));
+        $appointments = $patient->appointments()
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(5);
+
+        return view('patients.show', compact(
+            'patient',
+            'appointments'
+        ));
     }
 
+    
+
+    
     public function edit($id)
     {
         $patient = $this->findPatient($id);
