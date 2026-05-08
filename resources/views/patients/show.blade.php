@@ -114,10 +114,15 @@
                 @include('patients.partials.tabs.dental-chart')
             </div>
 
-            {{-- APPOINTMENTS (PHASE 2) --}}
-            <div id="appointments" class="tab-content" style="display:none;">
+          {{-- APPOINTMENTS --}}
+            <div id="appointments"
+                 class="tab-content"
+                 style="display:none;">
+
                 @include('patients.partials.tabs.appointments')
+
             </div>
+          
 
         </div>
 
@@ -150,14 +155,52 @@ function closeModal() {
 }
 
 // Tabs
-function openTab(event, tabId) {
 
-    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+function openTab(event, tabId)
+{
+    document.querySelectorAll('.tab-content')
+        .forEach(t => t.style.display = 'none');
+
+    document.querySelectorAll('.tab-btn')
+        .forEach(b => b.classList.remove('active-tab'));
 
     document.getElementById(tabId).style.display = 'block';
+
     event.currentTarget.classList.add('active-tab');
+
+    // SAVE LAST TAB
+    localStorage.setItem('activePatientTab', tabId);
 }
+
+window.addEventListener('load', () => {
+
+    const savedTab = localStorage.getItem('activePatientTab');
+
+    if (savedTab) {
+
+        const tabButton = document.querySelector(
+            `[onclick="openTab(event,'${savedTab}')"]`
+        );
+
+        if (tabButton) {
+            tabButton.click();
+        }
+
+        return;
+    }
+
+    // fallback to overview
+    const defaultTab = document.querySelector(
+        `[onclick="openTab(event,'overview')"]`
+    );
+
+    if (defaultTab) {
+        defaultTab.click();
+    }
+
+});
+
+
 
 </script>
 

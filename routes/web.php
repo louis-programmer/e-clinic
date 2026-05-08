@@ -107,7 +107,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
         ->name('appointments.reschedule');
+
+        Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])
+    ->name('appointments.destroy');
 });
+
+
 
     /*
     |--------------------------------------------------------------------------

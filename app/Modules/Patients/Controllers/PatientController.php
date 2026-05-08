@@ -58,7 +58,7 @@ class PatientController extends Controller
         ]);
 
         $appointments = $patient->appointments()
-            ->orderBy('appointment_date', 'desc')
+            ->latest('appointment_date')
             ->paginate(5);
 
         return view('patients.show', compact(
@@ -66,8 +66,6 @@ class PatientController extends Controller
             'appointments'
         ));
     }
-
-    
 
     
     public function edit($id)

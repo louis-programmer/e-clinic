@@ -117,4 +117,25 @@ class AppointmentController extends Controller
 
 
 
+    public function destroy(Appointment $appointment)
+    {
+        $user = auth()->user();
+
+        // ROLE CHECK (adjust to your config system)
+        if (! $user->hasAnyRole(...config('roles.patient_manage'))) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Optional safety rule: prevent deleting completed records
+        if ($appointment->status === 'completed') {
+            return back()->with('error', 'Completed appointments cannot be deleted.');
+        }
+
+        $appointment->delete();
+
+        return back()->with('success', 'Appointment deleted successfully.');
+    }
+
+
+
 }

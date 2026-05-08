@@ -3,12 +3,7 @@
 {{-- ===================================================== --}}
 <div class="card">
 
-    <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:15px;
-    ">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h3 style="margin:0;">Create Appointment</h3>
     </div>
 
@@ -17,35 +12,24 @@
 
         @csrf
 
-        {{-- DATE --}}
-        <label>Date & Time</label>
+        <div style="margin-bottom:14px;">
+            <label style="display:block;margin-bottom:6px;font-weight:600;">Date & Time</label>
+            <input type="datetime-local" name="appointment_date" class="form-input" required>
+        </div>
 
-        <input type="datetime-local"
-               name="appointment_date"
-               class="form-input"
-               required>
+        <div style="margin-bottom:14px;">
+            <label style="display:block;margin-bottom:6px;font-weight:600;">Purpose</label>
+            <input type="text" name="purpose" class="form-input" placeholder="General consultation">
+        </div>
 
-        {{-- PURPOSE --}}
-        <label style="margin-top:10px;">Purpose</label>
+        <div style="margin-bottom:18px;">
+            <label style="display:block;margin-bottom:6px;font-weight:600;">Notes</label>
+            <textarea name="notes" class="form-input" rows="3" placeholder="Additional notes..."></textarea>
+        </div>
 
-        <input type="text"
-               name="purpose"
-               class="form-input">
-
-        {{-- NOTES --}}
-        <label style="margin-top:10px;">Notes</label>
-
-        <textarea name="notes"
-                  class="form-input"></textarea>
-
-        {{-- BUTTON --}}
-        <button class="btn btn-primary"
-                style="margin-top:15px;">
-            + Create Appointment
-        </button>
+        <button class="btn btn-primary">+ Create Appointment</button>
 
     </form>
-
 </div>
 
 
@@ -57,147 +41,118 @@
 {{-- ===================================================== --}}
 <div class="card" style="margin-top:20px;">
 
-    <h3>Appointments</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <h3 style="margin:0;">Appointments</h3>
 
-    {{-- TOP PAGINATION --}}
-    @if($appointments->hasPages())
-        <div style="margin-bottom:15px;">
-            {{ $appointments->links() }}
+        <div style="font-size:13px;color:#64748b;">
+            Total: <strong>{{ $appointments->total() }}</strong>
         </div>
+    </div>
+
+
+
+
+
+    {{-- ===================================================== --}}
+    {{-- PAGINATION (TOP) --}}
+    {{-- ===================================================== --}}
+    @if($appointments->hasPages())
+
+        <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px;">
+
+            @if($appointments->onFirstPage())
+                <span style="padding:6px 12px;background:#e2e8f0;border-radius:6px;color:#94a3b8;">←</span>
+            @else
+                <a href="{{ $appointments->previousPageUrl() }}#appointments"
+                   style="padding:6px 12px;background:#f1f5f9;border-radius:6px;text-decoration:none;">
+                    ←
+                </a>
+            @endif
+
+            <span style="padding:6px 12px;background:#3b82f6;color:white;border-radius:6px;">
+                {{ $appointments->currentPage() }}
+            </span>
+
+            @if($appointments->hasMorePages())
+                <a href="{{ $appointments->nextPageUrl() }}#appointments"
+                   style="padding:6px 12px;background:#f1f5f9;border-radius:6px;text-decoration:none;">
+                    →
+                </a>
+            @else
+                <span style="padding:6px 12px;background:#e2e8f0;border-radius:6px;color:#94a3b8;">→</span>
+            @endif
+
+        </div>
+
     @endif
 
-    {{-- APPOINTMENTS --}}
+
+
+
+
+    {{-- ===================================================== --}}
+    {{-- APPOINTMENTS LOOP --}}
+    {{-- ===================================================== --}}
     @forelse($appointments as $appointment)
 
         @php
-
             $statusColors = [
-                'scheduled'   => '#3b82f6',
+                'scheduled'   => '#2563eb',
                 'completed'   => '#16a34a',
                 'cancelled'   => '#dc2626',
-                'rescheduled' => '#f59e0b',
+                'rescheduled' => '#d97706',
                 'no_show'     => '#6b7280',
             ];
 
-            $statusColor = $statusColors[$appointment->status] ?? '#64748b';
+            $status = $appointment->status ?? 'scheduled';
+            $statusColor = $statusColors[$status] ?? '#64748b';
 
+            $canManage = auth()->user()->hasAnyRole(...config('roles.patient_manage'));
+            $isLocked = in_array($status, ['completed', 'cancelled', 'no_show']);
         @endphp
 
-        <div style="
-            position:relative;
-            padding:15px;
-            border-left:3px solid {{ $statusColor }};
-            margin-bottom:15px;
-            background:#f8fafc;
-            border-radius:8px;
-        ">
 
-            {{-- DATE --}}
-            <div style="
-                font-size:12px;
-                color:#64748b;
-                margin-bottom:6px;
-            ">
-                {{ $appointment->appointment_date?->format('M d, Y h:i A') }}
-            </div>
 
-            {{-- PURPOSE --}}
-            <p style="margin:0 0 6px 0;">
-                <strong>Purpose:</strong>
-                {{ $appointment->purpose ?? '—' }}
-            </p>
 
-            {{-- STATUS --}}
-            <div style="margin-bottom:10px;">
 
-                <strong>Status:</strong>
+        <div style="background:#f8fafc;border-left:4px solid {{ $statusColor }};border-radius:10px;padding:18px;margin-bottom:16px;">
 
-                <span style="
-                    padding:4px 8px;
-                    border-radius:6px;
-                    font-size:12px;
-                    color:white;
-                    background:{{ $statusColor }};
-                ">
-                    {{ ucfirst(str_replace('_', ' ', $appointment->status ?? 'scheduled')) }}
-                </span>
+
+
+
+            {{-- HEADER --}}
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:14px;">
+
+                <div>
+                    <div style="font-size:13px;color:#64748b;margin-bottom:6px;">
+                        {{ $appointment->appointment_date?->format('M d, Y h:i A') }}
+                    </div>
+
+                    <div style="font-size:16px;font-weight:600;">
+                        {{ $appointment->purpose ?: 'General Appointment' }}
+                    </div>
+                </div>
+
+
+
+
+
+                <div>
+                    <span style="padding:6px 10px;border-radius:999px;background:{{ $statusColor }};color:white;font-size:12px;text-transform:capitalize;">
+                        {{ str_replace('_', ' ', $status) }}
+                    </span>
+                </div>
 
             </div>
+
+
+
+
 
             {{-- NOTES --}}
-            <p style="margin:0 0 12px 0;">
+            <div style="margin-bottom:16px;color:#334155;line-height:1.6;">
                 <strong>Notes:</strong><br>
-                {{ $appointment->notes ?? '—' }}
-            </p>
-
-
-
-
-
-            {{-- ===================================================== --}}
-            {{-- ACTION BUTTONS --}}
-            {{-- ===================================================== --}}
-            <div style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-                margin-top:10px;
-            ">
-
-                {{-- COMPLETE --}}
-                @if($appointment->status !== 'completed')
-
-                    <form method="POST"
-                          action="{{ route('appointments.complete', $appointment->id) }}">
-
-                        @csrf
-
-                        <button class="btn btn-sm">
-                            Complete
-                        </button>
-
-                    </form>
-
-                @endif
-
-
-
-                {{-- CANCEL --}}
-                @if($appointment->status !== 'cancelled')
-
-                    <form method="POST"
-                          action="{{ route('appointments.cancel', $appointment->id) }}">
-
-                        @csrf
-
-                        <button class="btn btn-sm"
-                                style="background:red;color:white;">
-                            Cancel
-                        </button>
-
-                    </form>
-
-                @endif
-
-
-
-                {{-- NO SHOW --}}
-                @if($appointment->status !== 'no_show')
-
-                    <form method="POST"
-                          action="{{ route('appointments.no-show', $appointment->id) }}">
-
-                        @csrf
-
-                        <button class="btn btn-sm"
-                                style="background:#6b7280;color:white;">
-                            No Show
-                        </button>
-
-                    </form>
-
-                @endif
-
+                {{ $appointment->notes ?: 'No notes provided.' }}
             </div>
 
 
@@ -205,30 +160,83 @@
 
 
             {{-- ===================================================== --}}
-            {{-- RESCHEDULE --}}
+            {{-- ACTIONS --}}
             {{-- ===================================================== --}}
-            <form method="POST"
-                  action="{{ route('appointments.reschedule', $appointment->id) }}"
-                  style="margin-top:12px;">
+            @if(!$isLocked)
 
-                @csrf
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
 
-                <input type="datetime-local"
-                       name="appointment_date"
-                       class="form-input">
+                    {{-- COMPLETE --}}
+                    <form method="POST" action="{{ route('appointments.complete', $appointment->id) }}">
+                        @csrf
+                        <button class="btn btn-sm" style="background:#16a34a;color:white;">Complete</button>
+                    </form>
 
-                <button class="btn btn-sm"
-                        style="margin-top:8px;">
-                    Reschedule
-                </button>
+                    {{-- CANCEL --}}
+                    <form method="POST" action="{{ route('appointments.cancel', $appointment->id) }}">
+                        @csrf
+                        <button class="btn btn-sm" style="background:#dc2626;color:white;">Cancel</button>
+                    </form>
 
-            </form>
+                    {{-- NO SHOW --}}
+                    <form method="POST" action="{{ route('appointments.no-show', $appointment->id) }}">
+                        @csrf
+                        <button class="btn btn-sm" style="background:#6b7280;color:white;">No Show</button>
+                    </form>
+
+                    {{-- DELETE --}}
+                    @if($canManage)
+                        <form method="POST"
+                              action="{{ route('appointments.destroy', $appointment->id) }}"
+                              onsubmit="return confirm('Delete this appointment?');">
+                            @csrf
+                            @method('DELETE')
+
+                            <button class="btn btn-sm" style="background:#111827;color:white;">
+                                Delete
+                            </button>
+                        </form>
+                    @endif
+
+                </div>
+
+            @endif
+
+
+
+
+
+            {{-- RESCHEDULE --}}
+            @if(!$isLocked)
+
+                <form method="POST"
+                      action="{{ route('appointments.reschedule', $appointment->id) }}"
+                      style="border-top:1px solid #e2e8f0;padding-top:14px;">
+
+                    @csrf
+
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+
+                        <input type="datetime-local"
+                               name="appointment_date"
+                               class="form-input"
+                               style="max-width:260px;">
+
+                        <button class="btn btn-sm">Reschedule</button>
+
+                    </div>
+
+                </form>
+
+            @endif
 
         </div>
 
     @empty
 
-        <p>No appointments yet.</p>
+        <div style="background:#f8fafc;border-radius:10px;padding:35px;text-align:center;color:#64748b;">
+            No appointments yet.
+        </div>
 
     @endforelse
 
@@ -236,11 +244,35 @@
 
 
 
-    {{-- BOTTOM PAGINATION --}}
+    {{-- ===================================================== --}}
+    {{-- PAGINATION (BOTTOM) --}}
+    {{-- ===================================================== --}}
     @if($appointments->hasPages())
 
-        <div style="margin-top:15px;">
-            {{ $appointments->links() }}
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:20px;">
+
+            @if($appointments->onFirstPage())
+                <span style="padding:6px 12px;background:#e2e8f0;border-radius:6px;color:#94a3b8;">←</span>
+            @else
+                <a href="{{ $appointments->previousPageUrl() }}#appointments"
+                   style="padding:6px 12px;background:#f1f5f9;border-radius:6px;text-decoration:none;">
+                    ←
+                </a>
+            @endif
+
+            <span style="padding:6px 12px;background:#3b82f6;color:white;border-radius:6px;">
+                {{ $appointments->currentPage() }}
+            </span>
+
+            @if($appointments->hasMorePages())
+                <a href="{{ $appointments->nextPageUrl() }}#appointments"
+                   style="padding:6px 12px;background:#f1f5f9;border-radius:6px;text-decoration:none;">
+                    →
+                </a>
+            @else
+                <span style="padding:6px 12px;background:#e2e8f0;border-radius:6px;color:#94a3b8;">→</span>
+            @endif
+
         </div>
 
     @endif
