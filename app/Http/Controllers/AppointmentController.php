@@ -3,15 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-#use App\Models\Appointment;
 use App\Modules\Patients\Models\Appointment;
+use App\Enums\AppointmentStatus;
+
 
 class AppointmentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('role:admin,staff,doctor');
+        $this->middleware('role:admin,staff,doctor')
+            ->only([
+                'store',
+                'complete',
+                'cancel',
+                'reschedule',
+                'noShow'
+            ]);
+
+        $this->middleware('role:admin')
+            ->only([
+                'destroy'
+            ]);
     }
 
     /*
@@ -22,7 +34,7 @@ class AppointmentController extends Controller
     public function store(Request $request, $patientId)
     {
         $validated = $request->validate([
-            'appointment_date' => 'required|date',
+            'appointment_date' => 'required|date|after_or_equal:now',
             'purpose'          => 'nullable|string|max:255',
             'notes'            => 'nullable|string',
         ]);
@@ -38,95 +50,76 @@ class AppointmentController extends Controller
         return back()->with('success', 'Appointment created successfully.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Complete Appointment
-    |--------------------------------------------------------------------------
-    */
     public function complete(Appointment $appointment)
     {
-        $this->updateStatus($appointment, 'completed');
+        $this->lockCheck($appointment);
+
+        $appointment->update([
+            'status' => 'completed'
+        ]);
 
         return back()->with('success', 'Appointment marked as completed.');
     }
 
+
+        public function reschedule(Request $request, Appointment $appointment)
+        {
+            $this->lockCheck($appointment);
+
+            $validated = $request->validate([
+                'appointment_date' => 'required|date|after_or_equal:now',
+            ]);
+
+            $appointment->update([
+                'appointment_date' => $validated['appointment_date'],
+                'status' => 'rescheduled',
+            ]);
+
+            return back()->with('success', 'Appointment rescheduled.');
+        }
+
+
+
+
     /*
     |--------------------------------------------------------------------------
-    | Cancel Appointment
+    | Cancel Appointment (FIXED MISSING METHOD)
     |--------------------------------------------------------------------------
     */
     public function cancel(Appointment $appointment)
     {
-        $this->updateStatus($appointment, 'cancelled');
+        $this->lockCheck($appointment);
+
+        $appointment->update([
+            'status' => 'cancelled'
+        ]);
 
         return back()->with('success', 'Appointment cancelled.');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Reschedule Appointment
+    | No Show (STANDARDIZED)
     |--------------------------------------------------------------------------
     */
-    public function reschedule(Request $request, Appointment $appointment)
-    {
-        $validated = $request->validate([
-            'appointment_date' => 'required|date',
-        ]);
-
-        $appointment->update([
-            'appointment_date' => $validated['appointment_date'],
-            'status'           => 'rescheduled',
-        ]);
-
-        return back()->with('success', 'Appointment rescheduled.');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Upcoming Appointments
-    |--------------------------------------------------------------------------
-    */
-    public function upcoming()
-    {
-        return Appointment::whereIn('status', ['scheduled', 'rescheduled'])
-            ->where('appointment_date', '>=', now())
-            ->orderBy('appointment_date', 'asc')
-            ->get();
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Helper: Update Status
-    |--------------------------------------------------------------------------
-    */
-    private function updateStatus(Appointment $appointment, string $status): void
-    {
-        $appointment->update([
-            'status' => $status,
-        ]);
-    }
-
-
     public function noShow(Appointment $appointment)
-        {
-            $appointment->status = 'no-show';
-            $appointment->save();
+    {
+        $this->lockCheck($appointment);
 
-            return back()->with('success', 'Appointment marked as no-show.');
-        }
+        $appointment->update([
+            'status' => 'no_show'
+        ]);
 
+        return back()->with('success', 'Appointment marked as no_show.');
+    }
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Appointment (ROLE HANDLED BY MIDDLEWARE)
+    |--------------------------------------------------------------------------
+    */
     public function destroy(Appointment $appointment)
     {
-        $user = auth()->user();
-
-        // ROLE CHECK (adjust to your config system)
-        if (! $user->hasAnyRole(...config('roles.patient_manage'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        // Optional safety rule: prevent deleting completed records
         if ($appointment->status === 'completed') {
             return back()->with('error', 'Completed appointments cannot be deleted.');
         }
@@ -136,6 +129,18 @@ class AppointmentController extends Controller
         return back()->with('success', 'Appointment deleted successfully.');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Helper: Lock Check
+    |--------------------------------------------------------------------------
+    */
+    private function lockCheck(Appointment $appointment)
+    {
+
+            if (in_array($appointment->status, AppointmentStatus::final())) {
+                abort(403, 'Appointment already finalized.');
+            }
+    }
 
 
 }

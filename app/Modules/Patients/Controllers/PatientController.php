@@ -6,22 +6,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modules\Patients\Models\Patient;
 use Illuminate\Support\Str;
-
+use App\Enums\AppointmentStatus;
 
 class PatientController extends Controller
 {
 
     public function __construct()
-        {
-            $this->middleware('auth');
+    {
+        $this->middleware('auth');
 
-            $this->middleware('role:' . implode(',', config('roles.patient_view')))
-                ->only(['index', 'show']);
+        $this->middleware('role:' . implode(',', config('roles.patient_view')))
+            ->only(['index', 'show']);
 
-            $this->middleware('role:' . implode(',', config('roles.patient_manage')))
-                ->only(['create', 'store', 'edit', 'update']);
-        }
-
+        $this->middleware('role:' . implode(',', config('roles.patient_manage')))
+            ->only(['create', 'store', 'edit', 'update']);
+    }
 
     public function index()
     {
@@ -29,8 +28,6 @@ class PatientController extends Controller
 
         return view('patients.index', compact('patients'));
     }
-
-
 
     public function create()
     {
@@ -41,10 +38,9 @@ class PatientController extends Controller
     {
         $validated = $this->validatePatient($request);
 
-        #$validated['patient_code'] = Str::uuid(); // or custom format
         $validated['patient_code'] = (string) Str::uuid();
 
-        $patient = Patient::create($validated);      
+        $patient = Patient::create($validated);
 
         return redirect('/patients/' . $patient->id)
             ->with('success', 'Patient created successfully');
@@ -57,17 +53,78 @@ class PatientController extends Controller
             'images',
         ]);
 
-        $appointments = $patient->appointments()
-            ->latest('appointment_date')
-            ->paginate(5);
+        /*
+        |--------------------------------------------------------------------------
+        | UPCOMING APPOINTMENTS
+        |--------------------------------------------------------------------------
+        */
+        $upcomingAppointments = $patient->appointments()
+            ->whereIn('status', AppointmentStatus::active())
+            ->whereDate('appointment_date', '>=', now()->toDateString())
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('id', 'asc')
+            ->paginate(5, ['*'], 'upcoming_page');
+
+        /*
+        |--------------------------------------------------------------------------
+        | REMOVE BUSINESS LOGIC FROM BLADE
+        |--------------------------------------------------------------------------
+        */
+        $upcomingAppointments->getCollection()->transform(function ($appointment) {
+
+            $appointment->is_locked = in_array(
+                $appointment->status,
+                AppointmentStatus::final()
+            );
+
+            return $appointment;
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | PREVIOUS APPOINTMENTS
+        |--------------------------------------------------------------------------
+        */
+        $previousAppointments = $patient->appointments()
+            ->where(function ($query) {
+
+                $query->whereIn(
+                    'status',
+                    AppointmentStatus::final()
+                )
+
+                ->orWhereDate(
+                    'appointment_date',
+                    '<',
+                    now()->toDateString()
+                );
+            })
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(5, ['*'], 'previous_page');
+
+        /*
+        |--------------------------------------------------------------------------
+        | REMOVE BUSINESS LOGIC FROM BLADE
+        |--------------------------------------------------------------------------
+        */
+        $previousAppointments->getCollection()->transform(function ($appointment) {
+
+            $appointment->is_locked = in_array(
+                $appointment->status,
+                AppointmentStatus::final()
+            );
+
+            return $appointment;
+        });
 
         return view('patients.show', compact(
             'patient',
-            'appointments'
+            'upcomingAppointments',
+            'previousAppointments'
         ));
     }
 
-    
     public function edit($id)
     {
         $patient = $this->findPatient($id);
@@ -89,7 +146,7 @@ class PatientController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Helpers (important for clean code)
+    | Helpers
     |--------------------------------------------------------------------------
     */
 
@@ -103,21 +160,13 @@ class PatientController extends Controller
         $required = $isUpdate ? 'nullable' : 'required';
 
         return $request->validate([
-            'first_name' => $required . '|string|max:255',
-            'last_name' => $required . '|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
+            'first_name'     => $required . '|string|max:255',
+            'last_name'      => $required . '|string|max:255',
+            'middle_name'    => 'nullable|string|max:255',
             'contact_number' => $required . '|string|max:20',
-            'address' => $required . '|string|max:500',
-            'gender' => $required . '|in:male,female,other',
-            'birthdate' => $required . '|date',
+            'address'        => $required . '|string|max:500',
+            'gender'         => $required . '|in:male,female,other',
+            'birthdate'      => $required . '|date',
         ]);
     }
-
-        
-          
-
-
-          ////
-
-
 }
