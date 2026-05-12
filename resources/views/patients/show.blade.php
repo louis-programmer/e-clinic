@@ -233,8 +233,12 @@
             History
         </button>
 
-        <button class="tab-btn" data-tab="notes">
+         <button class="tab-btn" data-tab="notes">
             Patient Notes
+        </button>
+
+        <button class="tab-btn" data-tab="encounters">
+            Encounter
         </button>
 
         <button class="tab-btn" data-tab="photos">
@@ -247,6 +251,10 @@
 
         <button class="tab-btn" data-tab="appointments">
             Appointments
+        </button>
+
+        <button class="tab-btn" data-tab="forms">
+            Forms
         </button>
 
     </div>
@@ -264,15 +272,23 @@
     </div>
 
 
-
-
-
-    {{-- PATIENT TIMELINE --}}
+ {{-- PATIENT TIMELINE --}}
     <div id="notes"
          class="tab-content"
          style="display:none;">
 
         @include('patients.partials.tabs.progress-notes')
+
+    </div>
+
+
+
+    {{-- PATIENT TIMELINE --}}
+    <div id="encounters"
+         class="tab-content"
+         style="display:none;">
+
+        @include('patients.partials.tabs.encounters')
 
     </div>
 
@@ -312,6 +328,16 @@
          style="display:none;">
 
         @include('patients.partials.tabs.appointments')
+
+    </div>
+
+
+        {{-- FORMS --}}
+    <div id="forms"
+         class="tab-content"
+         style="display:none;">
+
+        @include('patients.partials.tabs.forms')
 
     </div>
 

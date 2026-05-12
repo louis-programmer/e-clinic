@@ -1,42 +1,203 @@
+{{-- ===================================================== --}}
+{{-- CREATE PROGRESS NOTE --}}
+{{-- ===================================================== --}}
 <div class="card">
-    <h3>Add Encounter</h3>
 
-    <form method="POST" action="{{ route('encounters.store', $patient->id) }}">
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:20px;
+    ">
+        <h3 style="margin:0;">
+            Create Progress Note
+        </h3>
+    </div>
+
+
+
+
+
+    <form method="POST" action="#">
+
         @csrf
 
-        <label>Chief Complaint</label>
-        <textarea class="form-input" name="chief_complaint"></textarea>
+        {{-- ===================================================== --}}
+        {{-- PROCEDURE --}}
+        {{-- ===================================================== --}}
+        <div style="margin-bottom:14px;">
 
-        <label>Doctor Notes</label>
-        <textarea class="form-input" name="notes"></textarea>
+            <label style="
+                display:block;
+                margin-bottom:6px;
+                font-weight:600;
+            ">
+                Procedure
+            </label>
 
-        <label>Diagnosis</label>
-        <textarea class="form-input" name="diagnosis"></textarea>
+            <select name="procedure"
+                    class="form-input">
 
-        <button class="btn btn-primary">Save Encounter</button>
-    </form>
-</div>
+                <option value="">
+                    Select Procedure
+                </option>
 
-<div class="card" style="margin-top:20px;">
-    <h3>Encounter History</h3>
+                <option>
+                    Tooth Extraction
+                </option>
 
-    @forelse($patient->encounters as $encounter)
-        <div style="margin-bottom:20px;padding:15px;border-left:2px solid #e2e8f0;position:relative;">
+                <option>
+                    Oral Prophylaxis
+                </option>
 
-            <div style="position:absolute;left:-7px;top:18px;width:12px;height:12px;background:#3b82f6;border-radius:50%;border:2px solid #fff;"></div>
+                <option>
+                    Root Canal
+                </option>
 
-            <div style="font-size:12px;color:#64748b;">
-                {{ optional($encounter->encounter_date)->format('M d, Y h:i A') }}
-            </div>
+                <option>
+                    Dental Filling
+                </option>
 
-            <p><strong>Chief Complaint:</strong><br>{{ $encounter->chief_complaint ?? '—' }}</p>
-            <p><strong>Diagnosis:</strong><br>{{ $encounter->diagnosis ?? '—' }}</p>
-            <p><strong>Notes:</strong><br>{{ $encounter->notes ?? '—' }}</p>
-
-            <a href="/encounters/{{ $encounter->id }}/edit" class="btn">Edit</a>
+            </select>
 
         </div>
-    @empty
-        <p>No encounters yet.</p>
-    @endforelse
+
+
+
+
+
+        {{-- ===================================================== --}}
+        {{-- CATEGORY --}}
+        {{-- ===================================================== --}}
+        <div style="margin-bottom:14px;">
+
+            <label style="
+                display:block;
+                margin-bottom:6px;
+                font-weight:600;
+            ">
+                Category
+            </label>
+
+            <select name="category"
+                    class="form-input">
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option>
+                    Preventive
+                </option>
+
+                <option>
+                    Restorative
+                </option>
+
+                <option>
+                    Surgical
+                </option>
+
+                <option>
+                    Cosmetic
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+
+
+        {{-- ===================================================== --}}
+        {{-- REMARKS --}}
+        {{-- ===================================================== --}}
+        <div style="margin-bottom:14px;">
+
+            <label style="
+                display:block;
+                margin-bottom:6px;
+                font-weight:600;
+            ">
+                Remarks
+            </label>
+
+            <textarea name="remarks"
+                      rows="4"
+                      class="form-input"
+                      placeholder="Procedure remarks..."></textarea>
+
+        </div>
+
+
+
+
+
+        {{-- ===================================================== --}}
+        {{-- PAYMENT PLACEHOLDER --}}
+        {{-- ===================================================== --}}
+        <div style="
+            background:#f8fafc;
+            border-radius:10px;
+            padding:16px;
+            margin-bottom:20px;
+        ">
+
+            <div style="
+                font-weight:600;
+                margin-bottom:10px;
+            ">
+                Payment Information
+            </div>
+
+            <div style="
+                color:#64748b;
+                font-size:14px;
+                line-height:1.6;
+            ">
+                Payment workflow is still under discussion.
+            </div>
+
+        </div>
+
+
+
+
+
+        <button class="btn btn-primary">
+            + Save Progress Note
+        </button>
+
+    </form>
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- ===================================================== --}}
+{{-- PROGRESS NOTE HISTORY --}}
+{{-- ===================================================== --}}
+<div class="card" style="margin-top:20px;">
+
+    <h3 style="margin-top:0;">
+        Progress Note History
+    </h3>
+
+    <div style="
+        background:#f8fafc;
+        border-radius:10px;
+        padding:30px;
+        text-align:center;
+        color:#64748b;
+    ">
+        Progress notes will appear here.
+    </div>
+
 </div>
