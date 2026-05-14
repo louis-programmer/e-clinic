@@ -7,6 +7,7 @@ use App\Http\Controllers\AppointmentController;
 
 use App\Modules\Patients\Controllers\PatientController;
 use App\Modules\Patients\Controllers\PatientImageController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +35,8 @@ Route::middleware('auth')->group(function () {
     | Dashboard
     |--------------------------------------------------------------------------
     */
-    Route::get('/', fn () => view('dashboard'))
+    #Route::get('/', fn () => view('dashboard'))
+    Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard');
 
     Route::post('/logout', [AuthController::class, 'logout'])
