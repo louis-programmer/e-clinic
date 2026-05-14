@@ -30,6 +30,11 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware('auth')->group(function () {
 
+
+        Route::get('/loading', function () { // loading screen
+            return view('loading');
+        })->middleware('auth');
+
     /*
     |--------------------------------------------------------------------------
     | Dashboard

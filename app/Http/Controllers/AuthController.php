@@ -11,6 +11,7 @@ class AuthController extends Controller
     {
         if (Auth::check()) {
             return redirect('/');
+            #return redirect('/loading');
         }
 
         return view('auth.login');
@@ -30,7 +31,8 @@ class AuthController extends Controller
             // 3. Regenerate session (security fix)
             $request->session()->regenerate();
 
-            return redirect('/');
+            #return redirect('/');
+              return redirect('/loading'); // module to use the splash screen after login
         }
 
         return back()
