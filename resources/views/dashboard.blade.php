@@ -13,9 +13,12 @@
         </div>
     </div>
 
-    <button class="btn" style="display:flex; align-items:center; gap:8px;">
+    <button class="btn"
+            onclick="openCalendar()"
+            style="display:flex;align-items:center;gap:8px;">
         📅 Open Calendar
     </button>
+
 </div>
 
 
@@ -128,3 +131,105 @@
 </div>
 
 @endsection
+
+<!-- CALENDAR MODAL -->
+<div id="calendarModal" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+">
+
+    <div style="
+        background:white;
+        width:90%;
+        max-width:900px;
+        border-radius:12px;
+        padding:20px;
+        max-height:90vh;
+        overflow:auto;
+    ">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2 style="margin:0;">📅 Calendar</h2>
+
+            <button onclick="closeCalendar()" class="btn">Close</button>
+        </div>
+
+        <hr>
+
+        <!-- GRID -->
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(7,1fr);
+            gap:8px;
+            margin-top:15px;
+        ">
+
+            <!-- DAY LABELS -->
+            @foreach(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $day)
+                <div style="font-weight:600;text-align:center;color:#64748b;">
+                    {{ $day }}
+                </div>
+            @endforeach
+
+            <!-- EMPTY OFFSET -->
+            @for($i = 0; $i < $startOfMonth->dayOfWeek; $i++)
+                <div></div>
+            @endfor
+
+            <!-- DAYS -->
+            @foreach($daysInMonth as $day)
+
+                @php
+                    $dateKey = $day->format('Y-m-d');
+                    $hasAppointments = isset($appointments[$dateKey]);
+                @endphp
+
+                <div style="
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    padding:10px;
+                    min-height:60px;
+                    text-align:center;
+                    background: {{ $hasAppointments ? '#dbeafe' : 'white' }};
+                    cursor:pointer;
+                ">
+
+                    <div style="font-weight:600;">
+                        {{ $day->day }}
+                    </div>
+
+                    @if($hasAppointments)
+                        <div style="
+                            margin-top:5px;
+                            font-size:12px;
+                            color:#2563eb;
+                        ">
+                            {{ count($appointments[$dateKey]) }} appt
+                        </div>
+                    @endif
+
+                </div>
+
+            @endforeach
+
+        </div>
+    </div>
+</div>
+
+<script>
+function openCalendar() {
+    document.getElementById('calendarModal').style.display = 'flex';
+}
+
+function closeCalendar() {
+    document.getElementById('calendarModal').style.display = 'none';
+}
+</script>
