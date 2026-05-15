@@ -66,4 +66,9 @@ class Patient extends Model
         }
 
 
+        public function forms()
+        {
+            return $this->hasMany(\App\Modules\Forms\Models\PatientForm::class);
+        }
+
 }

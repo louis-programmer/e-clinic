@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 
 use App\Modules\Patients\Controllers\PatientController;
 use App\Modules\Patients\Controllers\PatientImageController;
+use App\Modules\Forms\Controllers\FormController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,23 @@ Route::middleware('auth')->group(function () {
         */
         Route::post('/{patient}/appointments', [AppointmentController::class, 'store'])
             ->name('appointments.store');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Patient Forms (FIXED & SECURE)
+        |--------------------------------------------------------------------------
+        */
+            Route::prefix('patients')->group(function () {
+
+                Route::post('/{patient}/forms', [FormController::class, 'store'])
+                    ->name('forms.store');
+
+                Route::get('/{patient}/forms/{form}/view', [FormController::class, 'view'])
+                    ->name('forms.view');
+
+                Route::delete('/{patient}/forms/{form}', [FormController::class, 'destroy'])
+                    ->name('forms.destroy');
+            });
     });
 
     /*
