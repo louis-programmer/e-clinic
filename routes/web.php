@@ -12,6 +12,7 @@ use App\Modules\Patients\Controllers\PatientController;
 use App\Modules\Patients\Controllers\PatientImageController;
 use App\Modules\Forms\Controllers\FormController;
 use App\Modules\Patients\Controllers\MedicalHistoryController;
+use App\Http\Controllers\ReminderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
+        Route::post('/reminders', [ReminderController::class, 'store']);
+        Route::post('/reminders/{reminder}/done', [ReminderController::class, 'markDone']);
 
     /*
     |--------------------------------------------------------------------------
