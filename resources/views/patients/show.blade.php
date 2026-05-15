@@ -230,7 +230,7 @@
     ">
 
         <button class="tab-btn active-tab" data-tab="overview">
-            History
+            History Overview
         </button>
 
          <button class="tab-btn" data-tab="notes">

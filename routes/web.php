@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Modules\Patients\Controllers\PatientController;
 use App\Modules\Patients\Controllers\PatientImageController;
 use App\Modules\Forms\Controllers\FormController;
+use App\Modules\Patients\Controllers\MedicalHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,20 +99,29 @@ Route::middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Patient Forms (FIXED & SECURE)
+        | Patient Forms
         |--------------------------------------------------------------------------
         */
-            Route::prefix('patients')->group(function () {
+        Route::post('/{patient}/forms', [FormController::class, 'store'])
+            ->name('forms.store');
 
-                Route::post('/{patient}/forms', [FormController::class, 'store'])
-                    ->name('forms.store');
+        Route::get('/{patient}/forms/{form}/view', [FormController::class, 'view'])
+            ->name('forms.view');
 
-                Route::get('/{patient}/forms/{form}/view', [FormController::class, 'view'])
-                    ->name('forms.view');
+        Route::delete('/{patient}/forms/{form}', [FormController::class, 'destroy'])
+            ->name('forms.destroy');
 
-                Route::delete('/{patient}/forms/{form}', [FormController::class, 'destroy'])
-                    ->name('forms.destroy');
-            });
+        /*
+        |--------------------------------------------------------------------------
+        | Medical History
+        |--------------------------------------------------------------------------
+        */
+        Route::post('/{patient}/medical-history', [MedicalHistoryController::class, 'store'])
+            ->name('medical-history.store');
+
+        Route::delete('/{patient}/medical-history/{history}', [MedicalHistoryController::class, 'destroy'])
+            ->name('medical-history.destroy');
+
     });
 
     /*

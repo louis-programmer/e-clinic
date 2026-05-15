@@ -71,4 +71,12 @@ class Patient extends Model
             return $this->hasMany(\App\Modules\Forms\Models\PatientForm::class);
         }
 
+        public function medicalHistories()
+        {
+            return $this->hasMany(\App\Modules\Patients\Models\MedicalHistory::class)
+                ->latest();
+        }
+
+
+
 }
