@@ -10,170 +10,309 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #1e293b;
-            --background: #475569;
-            --card: #334155;
-            --text: #ffffff;
-            --muted: #cbd5e1;
-            --accent: #3b82f6;
-            --border: #e2e8f0;
+
+        :root{
+            --primary:#1e293b;
+            --background:#475569;
+            --card:#334155;
+            --text:#ffffff;
+            --muted:#cbd5e1;
+            --accent:#3b82f6;
         }
 
-        * {
-            box-sizing: border-box;
+        *{
+            box-sizing:border-box;
         }
 
-        body {
-            margin: 0;
-            height: 100vh;
+        body{
+            margin:0;
+            height:100vh;
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            display:flex;
+            justify-content:center;
+            align-items:center;
 
-            background: var(--background);
+            background:var(--background);
 
-            font-family: 'Inter', sans-serif;
+            font-family:'Inter', sans-serif;
+
+            overflow:hidden;
         }
 
-        /* CARD WRAPPER */
-        .loader-card {
-            background: var(--card);
+        /* CARD */
+        .loader-card{
 
-            border-radius: 16px;
+            width:420px;
 
-            padding: 42px 36px;
+            background:var(--card);
 
-            width: 360px;
+            border-radius:18px;
 
-            text-align: center;
+            padding:40px 36px;
 
-            border: 1px solid rgba(255,255,255,0.06);
+            text-align:center;
+
+            border:1px solid rgba(255,255,255,0.08);
 
             box-shadow:
-                0 10px 25px rgba(0,0,0,0.08);
+                0 15px 35px rgba(0,0,0,0.18);
         }
 
-        /* LOGO SAFE AREA */
-        .logo-wrap {
+        /* LOGO AREA */
+        .logo-wrap{
 
-            width: 120px;
-            height: 120px;
+            width:100%;
 
-            margin: 0 auto 18px auto;
+            height:120px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display:flex;
+            justify-content:center;
+            align-items:center;
 
-            background: #273549;
-
-            border: 1px solid rgba(255,255,255,0.08);
-
-            border-radius: 14px;
+            margin-bottom:24px;
         }
 
-        .logo {
+        .logo{
 
-            width: 90px;
-            height: auto;
+            width:260px;
+            height:auto;
 
-            object-fit: contain;
+            object-fit:contain;
 
-            opacity: 0.82;
+            opacity:0.95;
 
-            filter: saturate(0.9);
+            filter:
+                drop-shadow(0 0 12px rgba(59,130,246,0.18));
         }
 
-        /* BRAND */
-        .brand-title {
+        /* TITLE */
+        .brand-title{
 
-            font-size: 22px;
-            font-weight: 700;
+            font-size:28px;
+            font-weight:700;
 
-            color: #ffffff;
+            color:#ffffff;
 
-            letter-spacing: 1px;
+            letter-spacing:1px;
 
-            margin-bottom: 4px;
+            margin-bottom:8px;
         }
 
-        .brand-subtitle {
+        .brand-subtitle{
 
-            font-size: 13px;
+            font-size:13px;
 
-            color: #cbd5e1;
+            color:var(--muted);
 
-            letter-spacing: 3px;
+            letter-spacing:3px;
 
-            text-transform: uppercase;
+            text-transform:uppercase;
         }
 
-        /* LOADING */
-        .loading {
+        /* ACCENT */
+        .accent{
 
-            margin-top: 26px;
+            width:70px;
+            height:4px;
 
-            font-size: 13px;
+            background:var(--accent);
 
-            color: #cbd5e1;
+            border-radius:999px;
 
-            letter-spacing: 2px;
+            margin:18px auto 20px auto;
         }
 
-        .dots::after {
-            content: '';
-            animation: dots 1.5s infinite;
+        /* LOADING TEXT */
+        .loading-text{
+
+            font-size:14px;
+
+            color:#ffffff;
+
+            font-weight:600;
+
+            letter-spacing:2px;
+
+            margin-bottom:18px;
         }
 
-        @keyframes dots {
+        .loading-text::after{
 
-            0% {
-                content: '';
+            content:'Initializing System';
+            animation:changeWords 12s infinite;
+        }
+
+        @keyframes changeWords{
+
+            0%,24%{
+                content:'Initializing System';
             }
 
-            25% {
-                content: '.';
+            25%,49%{
+                content:'Loading Resources';
             }
 
-            50% {
-                content: '..';
+            50%,74%{
+                content:'Connecting to Database';
             }
 
-            75% {
-                content: '...';
-            }
-
-            100% {
-                content: '';
+            75%,100%{
+                content:'Securing Connection';
             }
         }
 
-        /* FOOT NOTE */
-        .footer {
+        /* LOADING BAR */
+        .progress-container{
 
-            margin-top: 18px;
+            width:100%;
+            height:10px;
 
-            font-size: 11px;
+            background:rgba(255,255,255,0.10);
 
-            color: #94a3b8;
+            border-radius:999px;
 
-            letter-spacing: 1px;
+            overflow:hidden;
+
+            margin-bottom:40px;
         }
 
-        /* ACCENT BAR */
-        .accent {
+        .progress-bar{
 
-            width: 60px;
-            height: 3px;
+            height:100%;
 
-            background: var(--accent);
+            width:0%;
 
-            margin: 14px auto;
+            border-radius:999px;
 
-            border-radius: 10px;
+            background:linear-gradient(
+                90deg,
+                #60a5fa,
+                #3b82f6,
+                #2563eb
+            );
+
+            animation:loadBar 3s linear forwards;
+        }
+
+        @keyframes loadBar{
+
+            from{
+                width:0%;
+            }
+
+            to{
+                width:100%;
+            }
+        }
+
+        /* VPN AREA */
+        .vpn-zone{
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+
+            margin-top:10px;
+        }
+
+        /* GLOBE */
+        .globe{
+
+            font-size:34px;
+
+            margin-bottom:18px;
+
+            animation:globeBounce 1.8s infinite ease-in-out;
+
+            filter:drop-shadow(
+                0 0 10px rgba(59,130,246,0.4)
+            );
+        }
+
+        @keyframes globeBounce{
+
+            0%{
+                transform:translateY(0px) rotate(0deg);
+            }
+
+            20%{
+                transform:translateY(-8px) rotate(-6deg);
+            }
+
+            40%{
+                transform:translateY(-18px) rotate(8deg);
+            }
+
+            60%{
+                transform:translateY(-10px) rotate(-4deg);
+            }
+
+            80%{
+                transform:translateY(-14px) rotate(5deg);
+            }
+
+            100%{
+                transform:translateY(0px) rotate(0deg);
+            }
+        }
+
+        /* COUNTRIES */
+        .countries{
+
+            font-size:13px;
+
+            color:#cbd5e1;
+
+            letter-spacing:2px;
+
+            min-height:20px;
+        }
+
+        .countries::after{
+
+            content:'Dubai';
+
+            animation:countryFlash 5s infinite;
+        }
+
+        @keyframes countryFlash{
+
+            0%{
+                content:'Dubai';
+            }
+
+            20%{
+                content:'China';
+            }
+
+            40%{
+                content:'America';
+            }
+
+            60%{
+                content:'Japan';
+            }
+
+            80%{
+                content:'Russia';
+            }
+
+            100%{
+                content:'Dubai';
+            }
+        }
+
+        /* COPYRIGHT */
+        .footer{
+
+            margin-top:26px;
+
+            font-size:11px;
+
+            line-height:1.7;
+
+            color:#94a3b8;
         }
 
     </style>
@@ -184,39 +323,58 @@
 
     <div class="loader-card">
 
-        {{-- SAFE LOGO AREA --}}
+        {{-- LOGO --}}
         <div class="logo-wrap">
 
             <img
-                src="{{ asset('images/InitialLogo.png') }}"
+                src="{{ asset('images/mainbrandlogo.png') }}"
                 class="logo"
             >
 
         </div>
 
-        {{-- BRAND --}}
+        {{-- TITLE --}}
         <div class="brand-title">
             E-Clinic
         </div>
-
-        <div class="accent"></div>
 
         <div class="brand-subtitle">
             Dental Clinic Management System
         </div>
 
-        {{-- LOADING --}}
-        <div class="loading">
+        <div class="accent"></div>
 
-            INITIALIZING SYSTEM
+        {{-- LOADING STATUS --}}
+        <div class="loading-text"></div>
 
-            <span class="dots"></span>
+        {{-- LOADING BAR --}}
+        <div class="progress-container">
+
+            <div class="progress-bar"></div>
 
         </div>
 
-        {{-- FOOTER --}}
+        {{-- VPN AREA --}}
+        <div class="vpn-zone">
+
+            {{-- GLOBE ABOVE --}}
+            <div class="globe">
+                🌍
+            </div>
+
+            {{-- COUNTRIES BELOW --}}
+            <div class="countries"></div>
+
+        </div>
+
+        {{-- COPYRIGHT --}}
         <div class="footer">
-            Secure Medical Platform
+
+            © 2026 Lorem Ipsum Medical Technologies.<br>
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
         </div>
 
     </div>

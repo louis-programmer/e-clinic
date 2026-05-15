@@ -1,11 +1,12 @@
 <?php
-#May 14 upadate
+# May 15 update (safe upgrade, backward compatible)
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\AppointmentService;
 use App\Modules\Patients\Models\Appointment;
+use App\Enums\AppointmentStatus;
 
 class AppointmentController extends Controller
 {
@@ -47,7 +48,6 @@ class AppointmentController extends Controller
 
         return back()->with('success', 'Appointment created successfully.');
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -111,8 +111,14 @@ class AppointmentController extends Controller
     */
     public function destroy(Appointment $appointment)
     {
-        if ($appointment->status === 'completed') {
+        // Use enum instead of raw string (IMPORTANT FIX)
+        if ($appointment->status === AppointmentStatus::COMPLETED) {
             return back()->with('error', 'Completed appointments cannot be deleted.');
+        }
+
+        // Optional extra safety: prevent deleting final states
+        if (in_array($appointment->status, AppointmentStatus::final(), true)) {
+            return back()->with('error', 'Finalized appointments cannot be deleted.');
         }
 
         $appointment->delete();

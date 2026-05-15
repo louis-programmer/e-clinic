@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Modules\Patients\Models\Appointment;
@@ -9,6 +10,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Today Appointments
+        |--------------------------------------------------------------------------
+        */
         $todayAppointments = Appointment::with('patient')
             ->today()
             ->orderBy('appointment_date')
@@ -16,21 +22,41 @@ class DashboardController extends Controller
 
         $scheduledCount = $todayAppointments->count();
 
-        // ==============================
-        // CALENDAR DATA (CURRENT MONTH)
-        // ==============================
+        /*
+        |--------------------------------------------------------------------------
+        | Calendar Range (Current Month)
+        |--------------------------------------------------------------------------
+        */
         $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
+        $endOfMonth   = Carbon::now()->endOfMonth();
 
-        $appointments = Appointment::whereBetween('appointment_date', [
+        /*
+        |--------------------------------------------------------------------------
+        | Monthly Appointments
+        |--------------------------------------------------------------------------
+        */
+        $appointmentsRaw = Appointment::whereBetween('appointment_date', [
                 $startOfMonth,
                 $endOfMonth
             ])
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->appointment_date->format('Y-m-d');
-            });
+            ->get();
 
+        /*
+        |--------------------------------------------------------------------------
+        | SAFE GROUPING (Carbon safety fix)
+        |--------------------------------------------------------------------------
+        */
+        $appointments = $appointmentsRaw->groupBy(function ($item) {
+            return optional($item->appointment_date)
+                ? $item->appointment_date->format('Y-m-d')
+                : null;
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calendar Days
+        |--------------------------------------------------------------------------
+        */
         $daysInMonth = CarbonPeriod::create($startOfMonth, '1 day', $endOfMonth);
 
         return view('dashboard', compact(
@@ -41,6 +67,4 @@ class DashboardController extends Controller
             'startOfMonth'
         ));
     }
-
-
 }

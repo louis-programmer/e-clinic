@@ -1,13 +1,19 @@
 <?php
-#update May 14
+# update May 15 (safe upgrade, backward compatible)
 
 namespace App\Modules\Patients\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\AppointmentStatus;
+use App\Modules\Patients\Models\Patient;
 
 class Appointment extends Model
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Mass Assignment
+    |--------------------------------------------------------------------------
+    */
     protected $fillable = [
         'patient_id',
         'appointment_date',
@@ -16,9 +22,34 @@ class Appointment extends Model
         'notes',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Casts
+    |--------------------------------------------------------------------------
+    */
     protected $casts = [
         'appointment_date' => 'datetime',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Model Boot (SAFE DATA PROTECTION)
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Prevent invalid statuses from being saved
+        static::saving(function ($model) {
+            if (!AppointmentStatus::isValid($model->status)) {
+                throw new \InvalidArgumentException(
+                    "Invalid appointment status: {$model->status}"
+                );
+            }
+        });
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -71,5 +102,27 @@ class Appointment extends Model
     public function getStatusColorAttribute(): string
     {
         return AppointmentStatus::color($this->status);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Optional Safety Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Check if current status is valid (safe debug helper)
+     */
+    public function getIsValidStatusAttribute(): bool
+    {
+        return AppointmentStatus::isValid($this->status);
+    }
+
+    /**
+     * Check if appointment is still editable
+     */
+    public function getIsEditableAttribute(): bool
+    {
+        return in_array($this->status, AppointmentStatus::active(), true);
     }
 }

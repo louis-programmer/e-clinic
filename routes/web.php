@@ -1,13 +1,15 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EncounterController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\DashboardController;
 
 use App\Modules\Patients\Controllers\PatientController;
 use App\Modules\Patients\Controllers\PatientImageController;
-use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +24,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
@@ -30,23 +31,25 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware('auth')->group(function () {
 
-
-        Route::get('/loading', function () { // loading screen
-            return view('loading');
-        })->middleware('auth');
+    /*
+    |--------------------------------------------------------------------------
+    | Loading Screen
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/loading', function () {
+        return view('loading');
+    })->name('loading');
 
     /*
     |--------------------------------------------------------------------------
     | Dashboard
     |--------------------------------------------------------------------------
     */
-    #Route::get('/', fn () => view('dashboard'))
     Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard');
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
-
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +76,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/{patient}', [PatientController::class, 'update'])
             ->name('patients.update');
 
-
         /*
         |--------------------------------------------------------------------------
         | Patient Images
@@ -85,7 +87,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/images/{image}', [PatientImageController::class, 'destroy'])
             ->name('patients.images.destroy');
 
-
         /*
         |--------------------------------------------------------------------------
         | Patient Appointments
@@ -95,33 +96,28 @@ Route::middleware('auth')->group(function () {
             ->name('appointments.store');
     });
 
-
     /*
     |--------------------------------------------------------------------------
     | Appointment Actions
     |--------------------------------------------------------------------------
     */
- Route::prefix('appointments')->group(function () {
+    Route::prefix('appointments')->group(function () {
 
-    Route::post('{appointment}/no-show', [AppointmentController::class, 'noShow'])
-        ->name('appointments.no-show');
+        Route::post('{appointment}/no-show', [AppointmentController::class, 'noShow'])
+            ->name('appointments.no-show');
 
-    Route::post('{appointment}/cancel', [AppointmentController::class, 'cancel'])
-        ->name('appointments.cancel');
+        Route::post('{appointment}/cancel', [AppointmentController::class, 'cancel'])
+            ->name('appointments.cancel');
 
-    Route::post('{appointment}/complete', [AppointmentController::class, 'complete'])
-        ->name('appointments.complete');
+        Route::post('{appointment}/complete', [AppointmentController::class, 'complete'])
+            ->name('appointments.complete');
 
-    Route::post('{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
-        ->name('appointments.reschedule');
+        Route::post('{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
+            ->name('appointments.reschedule');
 
-        #Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])
-    #->name('appointments.destroy');
         Route::delete('{appointment}', [AppointmentController::class, 'destroy'])
-    ->name('appointments.destroy');
-});
-
-
+            ->name('appointments.destroy');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -139,7 +135,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/{encounter}', [EncounterController::class, 'update'])
             ->name('encounters.update');
     });
-
 
     /*
     |--------------------------------------------------------------------------
