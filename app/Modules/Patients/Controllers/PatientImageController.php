@@ -21,47 +21,49 @@ class PatientImageController extends Controller
 
     }
 
-    public function store(Request $request, $patientId)
-    {
-        $request->validate([
-            # 'image' => 'required|image|max:2048',
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        public function store(Request $request, $patientId)
+        {
+            $validated = $request->validate([
+                'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+                'type'  => 'required|in:photo,xray',
+            ]);
 
-        // ✅ HERE (file naming logic)
-        $filename = time() . '_' . $request->file('image')->getClientOriginalName();
+            $type = $validated['type'];
 
-        $path = $request->file('image')->storeAs('patient_images', $filename, 'public');
-        PatientImage::create([
-            'patient_id' => $patientId,
-            'file_path' => $path,
-            'uploaded_by' => auth()->id(),
-        ]);
+            // safer filename
+            $filename = uniqid() . '_' . time() . '.' . $request->file('image')->getClientOriginalExtension();
 
-        return back()->with('success', 'Image uploaded');
-    }
+            $path = $request->file('image')->storeAs(
+                'patient_images',
+                $filename,
+                'public'
+            );
 
+            PatientImage::create([
+                'patient_id'  => $patientId,
+                'file_path'   => $path,
+                'uploaded_by' => auth()->id(),
+                'type'        => $type,
+            ]);
 
-
-    public function destroy($id)
-    {
-       # $image = PatientImage::findOrFail($id);
-        $image = PatientImage::where('id', $id)
-            ->whereHas('patient', function ($q) {
-                // optional: scope by clinic later
-            })
-            ->firstOrFail(); # (We’ll refine this later when you add multi-clinic support)
-
-        // delete file from storage
-        if (Storage::disk('public')->exists($image->file_path)) {
-            Storage::disk('public')->delete($image->file_path);
+            return back()->with('success', 'Image uploaded');
         }
 
-        // delete DB record
-        $image->delete();
 
-        return back()->with('success', 'Image deleted successfully');
-    }
 
+        public function destroy($id)
+        {
+            $image = PatientImage::where('id', $id)
+                ->whereHas('patient') // ensures relation exists
+                ->firstOrFail();
+
+            if (Storage::disk('public')->exists($image->file_path)) {
+                Storage::disk('public')->delete($image->file_path);
+            }
+
+            $image->delete();
+
+            return back()->with('success', 'Image deleted successfully');
+        }
 
 }

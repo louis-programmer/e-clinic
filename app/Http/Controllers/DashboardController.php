@@ -5,11 +5,27 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Modules\Patients\Models\Appointment;
+use App\Modules\Patients\Models\Patient;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+
+                /*
+        |--------------------------------------------------------------------------
+        | Today Birthday
+        |--------------------------------------------------------------------------
+        */
+
+        $today = Carbon::today();
+
+        $birthdayPatients = Patient::query()
+            ->whereMonth('birthdate', $today->month)
+            ->whereDay('birthdate', $today->day)
+            ->get();
+
+
         /*
         |--------------------------------------------------------------------------
         | Today Appointments
@@ -59,12 +75,13 @@ class DashboardController extends Controller
         */
         $daysInMonth = CarbonPeriod::create($startOfMonth, '1 day', $endOfMonth);
 
-        return view('dashboard', compact(
-            'todayAppointments',
-            'scheduledCount',
-            'appointments',
-            'daysInMonth',
-            'startOfMonth'
-        ));
+            return view('dashboard', compact(
+                'todayAppointments',
+                'scheduledCount',
+                'appointments',
+                'daysInMonth',
+                'startOfMonth',
+                'birthdayPatients'
+            ));
     }
 }

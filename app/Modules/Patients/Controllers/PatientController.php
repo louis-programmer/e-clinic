@@ -10,30 +10,56 @@ use App\Enums\AppointmentStatus;
 
 class PatientController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
 
-        $this->middleware('role:' . implode(',', config('roles.patient_view')))
-            ->only(['index', 'show']);
+        $this->middleware(
+            'role:' . implode(',', config('roles.patient_view'))
+        )->only([
+            'index',
+            'show',
+        ]);
 
-        $this->middleware('role:' . implode(',', config('roles.patient_manage')))
-            ->only(['create', 'store', 'edit', 'update']);
+        $this->middleware(
+            'role:' . implode(',', config('roles.patient_manage'))
+        )->only([
+            'create',
+            'store',
+            'edit',
+            'update',
+        ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | LIST
+    |--------------------------------------------------------------------------
+    */
     public function index()
     {
-        $patients = Patient::latest()->paginate(10);
+        $patients = Patient::query()
+            ->latest()
+            ->paginate(10);
 
         return view('patients.index', compact('patients'));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE
+    |--------------------------------------------------------------------------
+    */
     public function create()
     {
         return view('patients.create');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | STORE
+    |--------------------------------------------------------------------------
+    */
     public function store(Request $request)
     {
         $validated = $this->validatePatient($request);
@@ -46,8 +72,18 @@ class PatientController extends Controller
             ->with('success', 'Patient created successfully');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW
+    |--------------------------------------------------------------------------
+    */
     public function show(Patient $patient)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | LOAD RELATIONSHIPS
+        |--------------------------------------------------------------------------
+        */
         $patient->load([
             'encounters',
             'images',
@@ -59,8 +95,15 @@ class PatientController extends Controller
         |--------------------------------------------------------------------------
         */
         $upcomingAppointments = $patient->appointments()
-            ->whereIn('status', AppointmentStatus::active())
-            ->whereDate('appointment_date', '>=', now()->toDateString())
+            ->whereIn(
+                'status',
+                AppointmentStatus::active()
+            )
+            ->whereDate(
+                'appointment_date',
+                '>=',
+                now()->toDateString()
+            )
             ->orderBy('appointment_date', 'asc')
             ->orderBy('id', 'asc')
             ->paginate(5, ['*'], 'upcoming_page');
@@ -70,15 +113,18 @@ class PatientController extends Controller
         | REMOVE BUSINESS LOGIC FROM BLADE
         |--------------------------------------------------------------------------
         */
-        $upcomingAppointments->getCollection()->transform(function ($appointment) {
+        $upcomingAppointments->getCollection()->transform(
+            function ($appointment) {
 
-            $appointment->is_locked = in_array(
-                $appointment->status,
-                AppointmentStatus::final()
-            );
+                $appointment->is_locked = in_array(
+                    $appointment->status,
+                    AppointmentStatus::final(),
+                    true
+                );
 
-            return $appointment;
-        });
+                return $appointment;
+            }
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -108,15 +154,18 @@ class PatientController extends Controller
         | REMOVE BUSINESS LOGIC FROM BLADE
         |--------------------------------------------------------------------------
         */
-        $previousAppointments->getCollection()->transform(function ($appointment) {
+        $previousAppointments->getCollection()->transform(
+            function ($appointment) {
 
-            $appointment->is_locked = in_array(
-                $appointment->status,
-                AppointmentStatus::final()
-            );
+                $appointment->is_locked = in_array(
+                    $appointment->status,
+                    AppointmentStatus::final(),
+                    true
+                );
 
-            return $appointment;
-        });
+                return $appointment;
+            }
+        );
 
         return view('patients.show', compact(
             'patient',
@@ -125,6 +174,11 @@ class PatientController extends Controller
         ));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT
+    |--------------------------------------------------------------------------
+    */
     public function edit($id)
     {
         $patient = $this->findPatient($id);
@@ -132,11 +186,19 @@ class PatientController extends Controller
         return view('patients.edit', compact('patient'));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE
+    |--------------------------------------------------------------------------
+    */
     public function update(Request $request, $id)
     {
         $patient = $this->findPatient($id);
 
-        $validated = $this->validatePatient($request, $isUpdate = true);
+        $validated = $this->validatePatient(
+            $request,
+            true
+        );
 
         $patient->update($validated);
 
@@ -146,27 +208,67 @@ class PatientController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Helpers
+    | HELPERS
     |--------------------------------------------------------------------------
     */
 
-    private function findPatient($id)
+    private function findPatient($id): Patient
     {
-        return Patient::findOrFail($id);
+        return Patient::query()
+            ->findOrFail((int) $id);
     }
 
-    private function validatePatient(Request $request, $isUpdate = false)
-    {
-        $required = $isUpdate ? 'nullable' : 'required';
+    private function validatePatient(
+        Request $request,
+        bool $isUpdate = false
+    ): array {
+
+        $required = $isUpdate
+            ? 'nullable'
+            : 'required';
 
         return $request->validate([
-            'first_name'     => $required . '|string|max:255',
-            'last_name'      => $required . '|string|max:255',
-            'middle_name'    => 'nullable|string|max:255',
-            'contact_number' => $required . '|string|max:20',
-            'address'        => $required . '|string|max:500',
-            'gender'         => $required . '|in:male,female,other',
-            'birthdate'      => $required . '|date',
+
+            'first_name' => [
+                $required,
+                'string',
+                'max:255',
+            ],
+
+            'last_name' => [
+                $required,
+                'string',
+                'max:255',
+            ],
+
+            'middle_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'contact_number' => [
+                $required,
+                'string',
+                'max:20',
+            ],
+
+            'address' => [
+                $required,
+                'string',
+                'max:500',
+            ],
+
+            'gender' => [
+                $required,
+                'in:male,female,other',
+            ],
+
+            'birthdate' => [
+                $required,
+                'date',
+                'before_or_equal:today',
+            ],
         ]);
     }
 }

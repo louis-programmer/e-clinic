@@ -13,40 +13,67 @@
     flex-wrap:wrap;
 ">
 
-    <!-- PATIENT IMAGE -->
-    <div>
+<!-- IMAGE + ACTIONS -->
+<div style="
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+">
 
-        @if(($patient->images ?? collect())->count())
+    {{-- EDIT BUTTON --}}
+    @auth
+        @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
 
-            <img src="{{ asset('storage/' . $patient->images->first()->file_path) }}"
-                 style="
+            <a href="/patients/{{ $patient->id }}/edit"
+               class="btn"
+               style="
                     width:120px;
-                    height:120px;
-                    border-radius:50%;
-                    object-fit:cover;
-                    border:4px solid #e2e8f0;
-                 ">
+                    text-align:center;
+               ">
 
-        @else
+                Edit Patient
 
-            <div style="
+            </a>
+
+        @endif
+    @endauth
+
+
+
+
+
+    {{-- PATIENT IMAGE --}}
+    @if(($patient->images ?? collect())->count())
+
+        <img src="{{ asset('storage/' . $patient->images->first()->file_path) }}"
+             style="
                 width:120px;
                 height:120px;
                 border-radius:50%;
-                background:#e2e8f0;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-size:42px;
-                color:#64748b;
-            ">
-                👤
-            </div>
+                object-fit:cover;
+                border:4px solid #e2e8f0;
+             ">
 
-        @endif
+    @else
 
-    </div>
+        <div style="
+            width:120px;
+            height:120px;
+            border-radius:50%;
+            background:#e2e8f0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:42px;
+            color:#64748b;
+        ">
+            👤
+        </div>
 
+    @endif
+
+</div>
 
 
 
@@ -155,24 +182,6 @@
 
 
 
-    <!-- ACTIONS -->
-    @auth
-        @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
-
-            <div>
-
-                <a href="/patients/{{ $patient->id }}/edit"
-                   class="btn">
-
-                    Edit Patient
-
-                </a>
-
-            </div>
-
-        @endif
-    @endauth
-
 </div>
 
 
@@ -245,6 +254,10 @@
             Dental Photos
         </button>
 
+        <button class="tab-btn" data-tab="xrays">
+            X-Rays
+        </button>
+
         <button class="tab-btn" data-tab="dental-chart">
             Dental Diagram
         </button>
@@ -306,7 +319,13 @@
     </div>
 
 
+   {{--  Xray  --}}
+    <div id="xrays"        
+     class="tab-content"
+         style="display:none;">
 
+        @include('patients.partials.tabs.xrays')
+    </div>
 
 
     {{-- DENTAL DIAGRAM --}}

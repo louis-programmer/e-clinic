@@ -216,6 +216,36 @@
             margin-top:10px;
         }
 
+        .vpn-label{
+
+    font-size:13px;
+
+    color:#e2e8f0;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:12px;
+
+    font-weight:600;
+}
+
+.gmt-time{
+
+    margin-top:12px;
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+    letter-spacing:2px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+}
+
         /* GLOBE */
         .globe{
 
@@ -269,6 +299,22 @@
             min-height:20px;
         }
 
+        .gmt-time{
+
+    margin-top:12px;
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+    letter-spacing:2px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+}
+
+
         .countries::after{
 
             content:'Dubai';
@@ -315,6 +361,8 @@
             color:#94a3b8;
         }
 
+
+
     </style>
 
 </head>
@@ -354,18 +402,29 @@
 
         </div>
 
-        {{-- VPN AREA --}}
+      {{-- VPN AREA --}}
         <div class="vpn-zone">
 
-            {{-- GLOBE ABOVE --}}
+            {{-- VPN LABEL --}}
+            <div class="vpn-label">
+                Connecting to VPN
+            </div>
+
+            {{-- GLOBE --}}
             <div class="globe">
                 🌍
             </div>
 
-            {{-- COUNTRIES BELOW --}}
+            {{-- COUNTRIES --}}
             <div class="countries"></div>
 
         </div>
+
+    {{-- GMT TIME --}}
+{{-- PH TIME --}}
+<div class="gmt-time" id="ph-time">
+    PH TIME: Loading...
+</div>
 
         {{-- COPYRIGHT --}}
         <div class="footer">
@@ -378,6 +437,26 @@
         </div>
 
     </div>
+<script>
+
+function updatePHTime() {
+
+    const now = new Date();
+
+    const phTime = now.toLocaleTimeString('en-PH', {
+        timeZone: 'Asia/Manila',
+        hour12: false
+    });
+
+    document.getElementById('ph-time').innerText =
+        'PH TIME: ' + phTime;
+}
+
+updatePHTime();
+
+setInterval(updatePHTime, 1000);
+
+</script>
 
 </body>
 </html>

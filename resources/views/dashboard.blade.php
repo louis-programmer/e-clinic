@@ -22,6 +22,34 @@
 </div>
 
 
+@if($birthdayPatients->count())
+    <div class="card" style="
+        margin-bottom:20px;
+        background:#fff7ed;
+        border:1px solid #fed7aa;
+        color:#9a3412;
+    ">
+
+        <div style="font-weight:700; margin-bottom:8px;">
+            🎉 Birthday Today
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            @foreach($birthdayPatients as $patient)
+                <div style="
+                    background:#ffedd5;
+                    padding:6px 10px;
+                    border-radius:999px;
+                    font-weight:600;
+                ">
+                    {{ $patient->full_name }}
+                </div>
+            @endforeach
+        </div>
+
+    </div>
+@endif
+
 
 
 

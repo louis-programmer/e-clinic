@@ -1,6 +1,6 @@
 <div class="card">
 
-    <h3>Patient Photos</h3>
+    <h3>Patient X-Rays</h3>
 
     {{-- UPLOAD --}}
     @auth
@@ -12,17 +12,18 @@
                   style="margin-bottom:20px;">
 
                 @csrf
-                <input type="hidden"
-                   name="type"
-                   value="photo">
+
+                <input type="hidden" name="type" value="xray">
 
                 <input type="file"
                        name="image"
                        accept="image/*"
                        class="form-input">
 
-                <button type="submit" class="btn btn-primary" style="margin-top:10px;">
-                    Upload Image
+                <button type="submit"
+                        class="btn btn-primary"
+                        style="margin-top:10px;">
+                    Upload X-Ray
                 </button>
 
             </form>
@@ -32,31 +33,27 @@
 
 </div>
 
-
 {{-- GALLERY --}}
 <div class="card" style="margin-top:20px;">
 
-    <h3>Gallery</h3>
+    <h3>X-Ray Gallery</h3>
 
     @php
-        $photos = $patient->images->where('type', 'photo');
+        $xrays = $patient->images()->xrays()->get();
     @endphp
 
-    @forelse($photos as $image)
+    @forelse($xrays as $image)
 
-        <div style="
-            display:inline-block;
-            margin:8px;
-            position:relative;
-        ">
+        <div style="display:inline-block; margin:8px; position:relative;">
 
             <img src="{{ asset('storage/' . $image->file_path) }}"
                  style="
-                    width:180px;
-                    height:180px;
+                    width:220px;
+                    height:220px;
                     object-fit:cover;
                     border-radius:10px;
                     cursor:pointer;
+                    background:#000;
                  "
                  onclick="openModal(this.src)">
 
@@ -72,7 +69,7 @@
                         @method('DELETE')
 
                         <button type="submit"
-                                onclick="return confirm('Delete this image?')"
+                                onclick="return confirm('Delete this X-Ray?')"
                                 style="
                                     background:red;
                                     color:white;
@@ -92,7 +89,7 @@
         </div>
 
     @empty
-        <p>No images uploaded yet.</p>
+        <p>No X-Rays uploaded yet.</p>
     @endforelse
 
 </div>
