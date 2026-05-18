@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Modules\Patients\Models\Patient;
 use Illuminate\Support\Str;
 use App\Enums\AppointmentStatus;
+use App\Modules\Patients\Models\Procedure;
+
 
 class PatientController extends Controller
 {
@@ -72,107 +74,62 @@ class PatientController extends Controller
             ->with('success', 'Patient created successfully');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SHOW
-    |--------------------------------------------------------------------------
-    */
-    public function show(Patient $patient)
-    {
         /*
         |--------------------------------------------------------------------------
-        | LOAD RELATIONSHIPS
+        | SHOW
         |--------------------------------------------------------------------------
         */
-        $patient->load([
-            'encounters',
-            'images',
-        ]);
+        public function show(Patient $patient)
+        {
+            $patient->load([
+                'encounters',
+                'images',
+            ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPCOMING APPOINTMENTS
-        |--------------------------------------------------------------------------
-        */
-        $upcomingAppointments = $patient->appointments()
-            ->whereIn(
-                'status',
-                AppointmentStatus::active()
-            )
-            ->whereDate(
-                'appointment_date',
-                '>=',
-                now()->toDateString()
-            )
-            ->orderBy('appointment_date', 'asc')
-            ->orderBy('id', 'asc')
-            ->paginate(5, ['*'], 'upcoming_page');
+            $upcomingAppointments = $patient->appointments()
+                ->whereIn('status', AppointmentStatus::active())
+                ->whereDate('appointment_date', '>=', now()->toDateString())
+                ->orderBy('appointment_date', 'asc')
+                ->orderBy('id', 'asc')
+                ->paginate(5, ['*'], 'upcoming_page');
 
-        /*
-        |--------------------------------------------------------------------------
-        | REMOVE BUSINESS LOGIC FROM BLADE
-        |--------------------------------------------------------------------------
-        */
-        $upcomingAppointments->getCollection()->transform(
-            function ($appointment) {
-
+            $upcomingAppointments->getCollection()->transform(function ($appointment) {
                 $appointment->is_locked = in_array(
                     $appointment->status,
                     AppointmentStatus::final(),
                     true
                 );
-
                 return $appointment;
-            }
-        );
+            });
 
-        /*
-        |--------------------------------------------------------------------------
-        | PREVIOUS APPOINTMENTS
-        |--------------------------------------------------------------------------
-        */
-        $previousAppointments = $patient->appointments()
-            ->where(function ($query) {
+            $previousAppointments = $patient->appointments()
+                ->where(function ($query) {
+                    $query->whereIn('status', AppointmentStatus::final())
+                        ->orWhereDate('appointment_date', '<', now()->toDateString());
+                })
+                ->orderBy('appointment_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->paginate(5, ['*'], 'previous_page');
 
-                $query->whereIn(
-                    'status',
-                    AppointmentStatus::final()
-                )
-
-                ->orWhereDate(
-                    'appointment_date',
-                    '<',
-                    now()->toDateString()
-                );
-            })
-            ->orderBy('appointment_date', 'desc')
-            ->orderBy('id', 'desc')
-            ->paginate(5, ['*'], 'previous_page');
-
-        /*
-        |--------------------------------------------------------------------------
-        | REMOVE BUSINESS LOGIC FROM BLADE
-        |--------------------------------------------------------------------------
-        */
-        $previousAppointments->getCollection()->transform(
-            function ($appointment) {
-
+            $previousAppointments->getCollection()->transform(function ($appointment) {
                 $appointment->is_locked = in_array(
                     $appointment->status,
                     AppointmentStatus::final(),
                     true
                 );
-
                 return $appointment;
-            }
-        );
+            });
 
-        return view('patients.show', compact(
-            'patient',
-            'upcomingAppointments',
-            'previousAppointments'
-        ));
-    }
+            // ✅ ADD THIS HERE (before return)
+            $procedures = Procedure::orderBy('name')->get();
+
+            return view('patients.show', compact(
+                'patient',
+                'upcomingAppointments',
+                'previousAppointments',
+                'procedures'
+            ));
+        }
 
     /*
     |--------------------------------------------------------------------------

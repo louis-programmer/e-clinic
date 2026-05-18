@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Modules\Patients\Models\PatientImage;
 #use App\Models\Appointment;
 use App\Modules\Patients\Models\Appointment;
+use App\Modules\Patients\Models\ProgressNote;
+
 
 class Patient extends Model
 {
@@ -78,5 +80,9 @@ class Patient extends Model
         }
 
 
-
+        public function progressNotes()
+        {
+            return $this->hasMany(\App\Modules\Patients\Models\ProgressNote::class);
+        }
+             
 }

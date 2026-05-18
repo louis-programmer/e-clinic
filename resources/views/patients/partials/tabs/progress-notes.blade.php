@@ -18,8 +18,7 @@
 
 
 
-    <form method="POST" action="#">
-
+<form method="POST" action="{{ route('progress-notes.store', $patient) }}">
         @csrf
 
         {{-- ===================================================== --}}
@@ -35,30 +34,19 @@
                 Procedure
             </label>
 
-            <select name="procedure"
-                    class="form-input">
+<select name="procedure_id" class="form-input">
 
-                <option value="">
-                    Select Procedure
-                </option>
+    <option value="">
+        Select Procedure
+    </option>
 
-                <option>
-                    Tooth Extraction
-                </option>
+    @foreach($procedures as $procedure)
+        <option value="{{ $procedure->id }}">
+            {{ $procedure->name }} - ₱{{ $procedure->price }}
+        </option>
+    @endforeach
 
-                <option>
-                    Oral Prophylaxis
-                </option>
-
-                <option>
-                    Root Canal
-                </option>
-
-                <option>
-                    Dental Filling
-                </option>
-
-            </select>
+</select>
 
         </div>
 

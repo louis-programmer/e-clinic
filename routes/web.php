@@ -13,6 +13,7 @@ use App\Modules\Patients\Controllers\PatientImageController;
 use App\Modules\Forms\Controllers\FormController;
 use App\Modules\Patients\Controllers\MedicalHistoryController;
 use App\Http\Controllers\ReminderController;
+use App\Modules\Patients\Controllers\ProgressNoteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,28 +35,18 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware('auth')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Loading Screen
-    |--------------------------------------------------------------------------
-    */
     Route::get('/loading', function () {
         return view('loading');
     })->name('loading');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard
-    |--------------------------------------------------------------------------
-    */
     Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard');
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
-        Route::post('/reminders', [ReminderController::class, 'store']);
-        Route::post('/reminders/{reminder}/done', [ReminderController::class, 'markDone']);
+    Route::post('/reminders', [ReminderController::class, 'store']);
+    Route::post('/reminders/{reminder}/done', [ReminderController::class, 'markDone']);
 
     /*
     |--------------------------------------------------------------------------
@@ -126,6 +117,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{patient}/medical-history/{history}', [MedicalHistoryController::class, 'destroy'])
             ->name('medical-history.destroy');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Progress Notes (FIXED)
+        |--------------------------------------------------------------------------
+        */
+        Route::post('/{patient}/progress-notes', [ProgressNoteController::class, 'store'])
+            ->name('progress-notes.store');
     });
 
     /*
@@ -181,5 +179,4 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [ScanController::class, 'store'])
             ->name('scan.store');
     });
-
 });
