@@ -123,11 +123,22 @@ class PatientController extends Controller
             // ✅ ADD THIS HERE (before return)
             $procedures = Procedure::orderBy('name')->get();
 
+
+            $progressNotes = $patient->progressNotes()
+                ->with([
+                    'procedure',
+                ])
+                ->latest()
+                ->get();
+
+
+
             return view('patients.show', compact(
                 'patient',
                 'upcomingAppointments',
                 'previousAppointments',
-                'procedures'
+                'procedures',
+                'progressNotes'
             ));
         }
 

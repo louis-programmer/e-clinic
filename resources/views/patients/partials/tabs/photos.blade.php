@@ -4,7 +4,7 @@
 
     {{-- UPLOAD --}}
     @auth
-        @if(auth()->user()->hasAnyRole(...config('roles.patient_manage')))
+        @if(auth()->user()->hasAnyRole(...config('roles.patient_photos')))
 
             <form action="{{ route('patients.images.store', $patient->id) }}"
                   method="POST"

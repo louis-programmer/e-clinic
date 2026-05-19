@@ -178,6 +178,59 @@
         Progress Note History
     </h3>
 
+    @forelse($progressNotes as $note)
+
+    <div style="
+        border:1px solid #e2e8f0;
+        border-radius:10px;
+        padding:16px;
+        margin-bottom:14px;
+        background:white;
+    ">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:10px;
+            gap:10px;
+            flex-wrap:wrap;
+        ">
+
+            <div>
+                <div style="font-weight:600;">
+                    {{ $note->procedure?->name ?? 'Unknown Procedure' }}
+                </div>
+
+                <div style="
+                    color:#64748b;
+                    font-size:13px;
+                ">
+                    {{ ucfirst($note->procedure?->category ?? 'uncategorized') }}
+                </div>
+            </div>
+
+            <div style="
+                color:#64748b;
+                font-size:13px;
+            ">
+                {{ $note->created_at->format('M d, Y h:i A') }}
+            </div>
+
+        </div>
+
+        @if($note->remarks)
+            <div style="
+                line-height:1.6;
+                color:#334155;
+            ">
+                {{ $note->remarks }}
+            </div>
+        @endif
+
+    </div>
+
+@empty
+
     <div style="
         background:#f8fafc;
         border-radius:10px;
@@ -185,7 +238,10 @@
         text-align:center;
         color:#64748b;
     ">
-        Progress notes will appear here.
+        No progress notes yet.
     </div>
+
+@endforelse
+
 
 </div>

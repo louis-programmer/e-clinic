@@ -14,18 +14,11 @@ class MedicalHistoryController extends Controller
     {
         $this->middleware('auth');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Optional Future Hardening
-        |--------------------------------------------------------------------------
-        |
-        | Uncomment later once roles are finalized.
-        |
-        */
-        /*
-        $this->middleware('role:admin,doctor,staff')
-            ->only(['store', 'destroy']);
-        */
+        $this->middleware(
+            'role:' . implode(',', config('roles.overview_history'))
+        )->only([
+            'store',
+        ]);
     }
 
     /*

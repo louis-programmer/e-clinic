@@ -8,11 +8,25 @@ use App\Modules\Patients\Models\Patient;
 
 class ProgressNoteController extends Controller
 {
+
+     public function __construct()
+    {
+        $this->middleware('auth');
+
+        $this->middleware(
+            'role:' . implode(',', config('roles.progress_notes'))
+        )->only([
+            'store',
+        ]);
+    }
+            
     public function store(Request $request, Patient $patient)
     {
+
+
         $validated = $request->validate([
             'procedure_id' => 'required|exists:procedures,id',
-            'remarks' => 'nullable|string',
+            'remarks' => 'nullable|string|max:5000',
         ]);
 
         $patient->progressNotes()->create([

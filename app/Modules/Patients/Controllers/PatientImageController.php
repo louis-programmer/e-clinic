@@ -13,11 +13,20 @@ class PatientImageController extends Controller
     {
         $this->middleware('auth');
 
-        // upload/view allowed
-        $this->middleware('role:admin,staff,doctor');
+  
 
-        // delete restricted
-        $this->middleware('role:admin,staff')->only(['destroy']);
+         $this->middleware(
+            'role:' . implode(',', config('roles.patient_photos'))
+        )->only([
+            'store',
+        ]);
+             
+        $this->middleware(
+            'role:' . implode(',', config('roles.patient_photos'))
+        )->only([
+            'destroy',
+        ]);
+
 
     }
 
