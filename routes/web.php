@@ -14,6 +14,8 @@ use App\Modules\Forms\Controllers\FormController;
 use App\Modules\Patients\Controllers\MedicalHistoryController;
 use App\Http\Controllers\ReminderController;
 use App\Modules\Patients\Controllers\ProgressNoteController;
+use App\Modules\Patients\Controllers\CheckoutController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -165,6 +167,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/{encounter}', [EncounterController::class, 'update'])
             ->name('encounters.update');
     });
+
+
+    Route::post('/{patient}/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store');
 
     /*
     |--------------------------------------------------------------------------

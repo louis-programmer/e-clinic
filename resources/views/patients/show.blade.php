@@ -243,8 +243,13 @@
         </button>
 
          <button class="tab-btn" data-tab="notes">
+            Procedures
+        </button>
+
+         <button class="tab-btn" data-tab="notes2">
             Patient Notes
         </button>
+
 
         <button class="tab-btn" data-tab="encounters">
             Encounter
@@ -291,6 +296,16 @@
          style="display:none;">
 
         @include('patients.partials.tabs.progress-notes')
+
+    </div>
+
+
+ {{-- PATIENT TIMELINE --}}
+    <div id="notes2"
+         class="tab-content"
+         style="display:none;">
+
+        @include('patients.partials.tabs.progress2')
 
     </div>
 

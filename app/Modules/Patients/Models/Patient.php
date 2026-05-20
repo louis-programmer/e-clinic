@@ -7,6 +7,7 @@ use App\Modules\Patients\Models\PatientImage;
 #use App\Models\Appointment;
 use App\Modules\Patients\Models\Appointment;
 use App\Modules\Patients\Models\ProgressNote;
+use App\Models\Invoice;
 
 
 class Patient extends Model
@@ -84,5 +85,11 @@ class Patient extends Model
         {
             return $this->hasMany(\App\Modules\Patients\Models\ProgressNote::class);
         }
+
+        public function invoices()
+        {
+            return $this->hasMany(Invoice::class);
+        }
+
              
 }

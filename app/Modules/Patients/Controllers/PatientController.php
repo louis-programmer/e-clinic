@@ -8,7 +8,7 @@ use App\Modules\Patients\Models\Patient;
 use Illuminate\Support\Str;
 use App\Enums\AppointmentStatus;
 use App\Modules\Patients\Models\Procedure;
-
+use App\Modules\Patients\Models\ProgressNote;
 
 class PatientController extends Controller
 {
@@ -131,6 +131,13 @@ class PatientController extends Controller
                 ->latest()
                 ->get();
 
+            $invoices = $patient->invoices()
+                ->with([
+                    'items',
+                ])
+                ->latest()
+                ->get();
+
 
 
             return view('patients.show', compact(
@@ -138,7 +145,8 @@ class PatientController extends Controller
                 'upcomingAppointments',
                 'previousAppointments',
                 'procedures',
-                'progressNotes'
+                'progressNotes',
+                'invoices'
             ));
         }
 

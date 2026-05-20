@@ -1,5 +1,5 @@
 {{-- ===================================================== --}}
-{{-- CREATE PROGRESS NOTE --}}
+{{-- PROCEDURE CHECKOUT / PROGRESS NOTE --}}
 {{-- ===================================================== --}}
 <div class="card">
 
@@ -10,52 +10,65 @@
         margin-bottom:20px;
     ">
         <h3 style="margin:0;">
-            Create Progress Note
+            Procedure Checkout / Progress Note
         </h3>
     </div>
 
-
-
-
-
-<form method="POST" action="{{ route('progress-notes.store', $patient) }}">
+    <form method="POST" action="{{ route('checkout.store', $patient) }}">
         @csrf
 
         {{-- ===================================================== --}}
-        {{-- PROCEDURE --}}
+        {{-- PROCEDURES (CHECKOUT SELECTION) --}}
         {{-- ===================================================== --}}
         <div style="margin-bottom:14px;">
 
             <label style="
                 display:block;
-                margin-bottom:6px;
+                margin-bottom:10px;
                 font-weight:600;
             ">
-                Procedure
+                Select Procedures
             </label>
 
-<select name="procedure_id" class="form-input">
+            @foreach($procedures as $procedure)
 
-    <option value="">
-        Select Procedure
-    </option>
+                <label style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:8px;
+                    padding:10px;
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    background:white;
+                ">
 
-    @foreach($procedures as $procedure)
-        <option value="{{ $procedure->id }}">
-            {{ $procedure->name }} - ₱{{ $procedure->price }}
-        </option>
-    @endforeach
+                    <div>
+                        <div style="font-weight:600;">
+                            {{ $procedure->name }}
+                        </div>
 
-</select>
+                        <div style="font-size:13px; color:#64748b;">
+                            Category: {{ ucfirst($procedure->category) }}
+                        </div>
+
+                        <div style="font-size:13px; color:#64748b;">
+                            ₱{{ number_format($procedure->price, 2) }}
+                        </div>
+                    </div>
+
+                    <input type="checkbox"
+                           name="procedures[]"
+                           value="{{ $procedure->id }}">
+
+                </label>
+
+            @endforeach
 
         </div>
 
-
-
-
-
         {{-- ===================================================== --}}
-        {{-- CATEGORY --}}
+        {{-- CATEGORY (OPTIONAL NOTE LEVEL) --}}
         {{-- ===================================================== --}}
         <div style="margin-bottom:14px;">
 
@@ -64,39 +77,21 @@
                 margin-bottom:6px;
                 font-weight:600;
             ">
-                Category
+                Note Category
             </label>
 
             <select name="category"
                     class="form-input">
 
-                <option value="">
-                    Select Category
-                </option>
-
-                <option>
-                    Preventive
-                </option>
-
-                <option>
-                    Restorative
-                </option>
-
-                <option>
-                    Surgical
-                </option>
-
-                <option>
-                    Cosmetic
-                </option>
+                <option value="">Select Category</option>
+                <option value="preventive">Preventive</option>
+                <option value="restorative">Restorative</option>
+                <option value="surgical">Surgical</option>
+                <option value="cosmetic">Cosmetic</option>
 
             </select>
 
         </div>
-
-
-
-
 
         {{-- ===================================================== --}}
         {{-- REMARKS --}}
@@ -114,16 +109,12 @@
             <textarea name="remarks"
                       rows="4"
                       class="form-input"
-                      placeholder="Procedure remarks..."></textarea>
+                      placeholder="Enter clinical notes or procedure remarks..."></textarea>
 
         </div>
 
-
-
-
-
         {{-- ===================================================== --}}
-        {{-- PAYMENT PLACEHOLDER --}}
+        {{-- CHECKOUT SUMMARY (PLACEHOLDER) --}}
         {{-- ===================================================== --}}
         <div style="
             background:#f8fafc;
@@ -136,7 +127,7 @@
                 font-weight:600;
                 margin-bottom:10px;
             ">
-                Payment Information
+                Checkout Summary
             </div>
 
             <div style="
@@ -144,17 +135,24 @@
                 font-size:14px;
                 line-height:1.6;
             ">
-                Payment workflow is still under discussion.
+                Selected procedures will be computed into an invoice in the next step.
+            </div>
+
+            <div style="
+                margin-top:10px;
+                font-weight:600;
+            ">
+                Estimated Total: ₱0.00
+                <small style="color:#64748b;">(to be computed)</small>
             </div>
 
         </div>
 
-
-
-
-
+        {{-- ===================================================== --}}
+        {{-- SUBMIT --}}
+        {{-- ===================================================== --}}
         <button class="btn btn-primary">
-            + Save Progress Note
+            + Create Checkout Entry
         </button>
 
     </form>
@@ -165,20 +163,16 @@
 
 
 
-
-
-
-
 {{-- ===================================================== --}}
-{{-- PROGRESS NOTE HISTORY --}}
+{{-- HISTORY (PROGRESS + BILLING SOURCE) --}}
 {{-- ===================================================== --}}
 <div class="card" style="margin-top:20px;">
 
     <h3 style="margin-top:0;">
-        Progress Note History
+        Progress & Checkout History
     </h3>
 
-    @forelse($progressNotes as $note)
+@forelse($invoices as $invoice)
 
     <div style="
         border:1px solid #e2e8f0;
@@ -188,44 +182,116 @@
         background:white;
     ">
 
+        {{-- ===================================================== --}}
+        {{-- HEADER --}}
+        {{-- ===================================================== --}}
         <div style="
             display:flex;
             justify-content:space-between;
-            margin-bottom:10px;
-            gap:10px;
+            margin-bottom:12px;
             flex-wrap:wrap;
+            gap:10px;
         ">
 
             <div>
-                <div style="font-weight:600;">
-                    {{ $note->procedure?->name ?? 'Unknown Procedure' }}
+
+                <div style="font-weight:700;">
+                    {{ $invoice->invoice_number }}
                 </div>
 
                 <div style="
-                    color:#64748b;
                     font-size:13px;
+                    color:#64748b;
                 ">
-                    {{ ucfirst($note->procedure?->category ?? 'uncategorized') }}
+                    Status:
+                    {{ ucfirst($invoice->status) }}
                 </div>
+
             </div>
 
             <div style="
-                color:#64748b;
+                text-align:right;
                 font-size:13px;
+                color:#64748b;
             ">
-                {{ $note->created_at->format('M d, Y h:i A') }}
+
+                <div>
+                    {{ $invoice->created_at->format('M d, Y h:i A') }}
+                </div>
+
+                <div style="
+                    margin-top:4px;
+                    font-weight:600;
+                    color:#0f172a;
+                ">
+                    Total:
+                    ₱{{ number_format($invoice->total, 2) }}
+                </div>
+
             </div>
 
         </div>
 
-        @if($note->remarks)
-            <div style="
-                line-height:1.6;
-                color:#334155;
-            ">
-                {{ $note->remarks }}
+        {{-- ===================================================== --}}
+        {{-- ITEMS --}}
+        {{-- ===================================================== --}}
+        <div style="
+            border-top:1px solid #e2e8f0;
+            padding-top:12px;
+        ">
+
+            @foreach($invoice->items as $item)
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    margin-bottom:8px;
+                    font-size:14px;
+                ">
+
+                    <div>
+                        {{ $item->description }}
+                    </div>
+
+                    <div>
+                        ₱{{ number_format($item->line_total, 2) }}
+                    </div>
+
+                </div>
+
+            @endforeach
+
+        </div>
+
+        {{-- ===================================================== --}}
+        {{-- FOOTER --}}
+        {{-- ===================================================== --}}
+        <div style="
+            border-top:1px solid #e2e8f0;
+            margin-top:12px;
+            padding-top:12px;
+            display:flex;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:10px;
+            font-size:14px;
+        ">
+
+            <div>
+                Balance:
+                <strong>
+                    ₱{{ number_format($invoice->balance, 2) }}
+                </strong>
             </div>
-        @endif
+
+            <div>
+                Paid:
+                <strong>
+                    ₱{{ number_format($invoice->paid_amount, 2) }}
+                </strong>
+            </div>
+
+        </div>
 
     </div>
 
@@ -238,10 +304,8 @@
         text-align:center;
         color:#64748b;
     ">
-        No progress notes yet.
+        No checkout records yet.
     </div>
 
 @endforelse
-
-
 </div>
