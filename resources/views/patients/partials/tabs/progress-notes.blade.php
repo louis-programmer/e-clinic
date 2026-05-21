@@ -195,10 +195,19 @@
 
             <div>
 
-                <div style="font-weight:700;">
-                    {{ $invoice->invoice_number }}
-                </div>
+ <div style="font-weight:700;">
 
+    <a href="{{ route('invoices.show', $invoice) }}"
+       style="
+            text-decoration:none;
+            color:#2563eb;
+       ">
+
+        {{ $invoice->invoice_number }}
+
+    </a>
+
+</div>
                 <div style="
                     font-size:13px;
                     color:#64748b;

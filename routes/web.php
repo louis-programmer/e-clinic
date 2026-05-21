@@ -16,6 +16,8 @@ use App\Http\Controllers\ReminderController;
 use App\Modules\Patients\Controllers\ProgressNoteController;
 use App\Modules\Patients\Controllers\CheckoutController;
 
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +77,27 @@ Route::middleware('auth')->group(function () {
         Route::put('/{patient}', [PatientController::class, 'update'])
             ->name('patients.update');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Progress Notes (FIXED)
+        |--------------------------------------------------------------------------
+        */
+        Route::post('/{patient}/progress-notes', [ProgressNoteController::class, 'store'])
+            ->name('progress-notes.store');
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        |Checkout
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/{patient}/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store');
+    
+
         /*
         |--------------------------------------------------------------------------
         | Patient Images
@@ -119,14 +142,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{patient}/medical-history/{history}', [MedicalHistoryController::class, 'destroy'])
             ->name('medical-history.destroy');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Progress Notes (FIXED)
-        |--------------------------------------------------------------------------
-        */
-        Route::post('/{patient}/progress-notes', [ProgressNoteController::class, 'store'])
-            ->name('progress-notes.store');
+
     });
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -169,8 +188,13 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    Route::post('/{patient}/checkout', [CheckoutController::class, 'store'])
-    ->name('checkout.store');
+
+
+    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
+    ->name('invoices.show');
+
+    Route::post('/invoices/{invoice}/payments', [PaymentController::class, 'store'])
+    ->name('payments.store');
 
     /*
     |--------------------------------------------------------------------------

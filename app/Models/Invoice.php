@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Payment;
+use App\Modules\Patients\Models\Patient;
+use App\Models\InvoiceItem;
 
 class Invoice extends Model
 {
@@ -22,4 +25,21 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceItem::class);
     }
+
+    public function payments()
+        {
+            return $this->hasMany(Payment::class);
+        }
+
+
+
+        public function patient()
+        {
+            return $this->belongsTo(Patient::class);
+        }
+
+
+    
+
+
 }
