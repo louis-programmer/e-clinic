@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modules\Patients\Models\Patient;
 use App\Modules\Patients\Models\Procedure;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
@@ -18,57 +18,62 @@ class CheckoutController extends Controller
         $validated = $request->validate([
             'procedures' => 'required|array',
             'procedures.*' => 'exists:procedures,id',
+            'remarks' => 'nullable|string',
         ]);
 
-        // =====================================================
-        // FETCH SELECTED PROCEDURES
-        // =====================================================
-        $procedures = Procedure::whereIn(
-            'id',
-            $validated['procedures']
-        )->get();
+        DB::transaction(function () use ($validated, $patient) {
 
-        // =====================================================
-        // CREATE INVOICE
-        // =====================================================
-        $invoice = $patient->invoices()->create([
-            'invoice_number' => 'INV-' . now()->format('YmdHis'),
-            'subtotal' => 0,
-            'total' => 0,
-            'paid_amount' => 0,
-            'balance' => 0,
-            'status' => 'unpaid',
-            'created_by' => auth()->id(),
-        ]);
+            // =====================================================
+            // FETCH SELECTED PROCEDURES
+            // =====================================================
+            $procedures = Procedure::whereIn(
+                'id',
+                $validated['procedures']
+            )->get();
 
-        // =====================================================
-        // COMPUTE TOTAL + CREATE ITEMS
-        // =====================================================
-        $subtotal = 0;
-
-        foreach ($procedures as $procedure) {
-
-            $lineTotal = $procedure->price;
-
-            $invoice->items()->create([
-                'procedure_id' => $procedure->id,
-                'description' => $procedure->name,
-                'qty' => 1,
-                'unit_price' => $procedure->price,
-                'line_total' => $lineTotal,
+            // =====================================================
+            // CREATE INVOICE
+            // =====================================================
+            $invoice = $patient->invoices()->create([
+                'invoice_number' => 'INV-' . now()->format('YmdHis'),
+                'subtotal' => 0,
+                'total' => 0,
+                'paid_amount' => 0,
+                'balance' => 0,
+                'status' => 'unpaid',
+                'remarks' => $validated['remarks'] ?? null,
+                'created_by' => auth()->id(),
             ]);
 
-            $subtotal += $lineTotal;
-        }
+            // =====================================================
+            // COMPUTE TOTAL + CREATE ITEMS
+            // =====================================================
+            $subtotal = 0;
 
-        // =====================================================
-        // UPDATE INVOICE TOTALS
-        // =====================================================
-        $invoice->update([
-            'subtotal' => $subtotal,
-            'total' => $subtotal,
-            'balance' => $subtotal,
-        ]);
+            foreach ($procedures as $procedure) {
+
+                $lineTotal = $procedure->price;
+
+                $invoice->items()->create([
+                    'procedure_id' => $procedure->id,
+                    'description' => $procedure->name,
+                    'qty' => 1,
+                    'unit_price' => $procedure->price,
+                    'line_total' => $lineTotal,
+                ]);
+
+                $subtotal += $lineTotal;
+            }
+
+            // =====================================================
+            // UPDATE INVOICE TOTALS
+            // =====================================================
+            $invoice->update([
+                'subtotal' => $subtotal,
+                'total' => $subtotal,
+                'balance' => $subtotal,
+            ]);
+        });
 
         // =====================================================
         // REDIRECT BACK TO PATIENT

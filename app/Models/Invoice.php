@@ -18,7 +18,9 @@ class Invoice extends Model
         'paid_amount',
         'balance',
         'status',
+        'remarks',
         'created_by',
+
     ];
 
     public function items()

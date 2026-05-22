@@ -30,68 +30,80 @@
                 Select Procedures
             </label>
 
-            @foreach($procedures as $procedure)
+@foreach($procedures as $category => $categoryProcedures)
 
-                <label style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    margin-bottom:8px;
-                    padding:10px;
-                    border:1px solid #e2e8f0;
-                    border-radius:8px;
-                    background:white;
-                ">
+    {{-- CATEGORY HEADER --}}
+    <div style="
+        margin-top:18px;
+        margin-bottom:10px;
+        font-weight:700;
+        font-size:15px;
+        color:#0f172a;
+        border-bottom:1px solid #e2e8f0;
+        padding-bottom:6px;
+    ">
+        {{ ucfirst($category) }}
+    </div>
 
-                    <div>
-                        <div style="font-weight:600;">
-                            {{ $procedure->name }}
-                        </div>
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+        gap:8px;
+    ">
 
-                        <div style="font-size:13px; color:#64748b;">
-                            Category: {{ ucfirst($procedure->category) }}
-                        </div>
-
-                        <div style="font-size:13px; color:#64748b;">
-                            ₱{{ number_format($procedure->price, 2) }}
-                        </div>
-                    </div>
-
-                    <input type="checkbox"
-                           name="procedures[]"
-                           value="{{ $procedure->id }}">
-
-                </label>
-
-            @endforeach
-
-        </div>
-
-        {{-- ===================================================== --}}
-        {{-- CATEGORY (OPTIONAL NOTE LEVEL) --}}
-        {{-- ===================================================== --}}
-        <div style="margin-bottom:14px;">
+        @foreach($categoryProcedures as $procedure)
 
             <label style="
-                display:block;
-                margin-bottom:6px;
-                font-weight:600;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:10px;
+                padding:8px 10px;
+                border:1px solid #e2e8f0;
+                border-radius:8px;
+                background:white;
+                cursor:pointer;
             ">
-                Note Category
+
+                <div style="
+                    min-width:0;
+                    flex:1;
+                ">
+
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#0f172a;
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                    ">
+                        {{ $procedure->name }}
+                    </div>
+
+                    <div style="
+                        font-size:12px;
+                        color:#64748b;
+                    ">
+                        ₱{{ number_format($procedure->price, 2) }}
+                    </div>
+
+                </div>
+
+                <input type="checkbox"
+                       name="procedures[]"
+                       value="{{ $procedure->id }}">
             </label>
 
-            <select name="category"
-                    class="form-input">
+        @endforeach
 
-                <option value="">Select Category</option>
-                <option value="preventive">Preventive</option>
-                <option value="restorative">Restorative</option>
-                <option value="surgical">Surgical</option>
-                <option value="cosmetic">Cosmetic</option>
+    </div>
 
-            </select>
+@endforeach
 
         </div>
+
+     
 
         {{-- ===================================================== --}}
         {{-- REMARKS --}}

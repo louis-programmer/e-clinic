@@ -24,52 +24,109 @@
 
         @csrf
 
-        {{-- ============================================= --}}
-        {{-- CONDITION DROPDOWN --}}
-        {{-- ============================================= --}}
-        <div style="margin-bottom:20px;">
+      {{-- ============================================= --}}
+{{-- CONDITIONS --}}
+{{-- ============================================= --}}
+<div style="margin-bottom:20px;">
+
+    <label style="
+        display:block;
+        margin-bottom:10px;
+        font-weight:600;
+    ">
+        Medical Conditions
+    </label>
+
+    @php
+        $conditions = [
+            'Hypertension',
+            'Diabetes',
+            'Asthma',
+            'Heart Disease',
+            'Tuberculosis',
+            'Arthritis',
+            'Allergies',
+            'Cancer',
+            'Kidney Disease',
+            'Liver Disease',
+            'Thyroid Disorder',
+            'Migraine',
+            'Epilepsy',
+            'Depression',
+            'Anxiety',
+            'Stroke',
+            'COPD',
+            'Pneumonia',
+            'Anemia',
+            'High Cholesterol',
+        ];
+    @endphp
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+        gap:10px;
+    ">
+
+        @foreach($conditions as $condition)
 
             <label style="
-                display:block;
-                margin-bottom:6px;
-                font-weight:600;
+                display:flex;
+                align-items:center;
+                gap:8px;
+                padding:10px;
+                border:1px solid #e2e8f0;
+                border-radius:8px;
+                background:white;
+                cursor:pointer;
             ">
-                Medical Condition
+
+                <input type="checkbox"
+                       name="conditions[]"
+                       value="{{ $condition }}">
+
+                <span>{{ $condition }}</span>
+
             </label>
 
-            <select name="condition_name"
-                    class="form-input">
+        @endforeach
 
-                <option value="">
-                    -- Select Condition --
-                </option>
+    </div>
 
-                <option value="Hypertension">Hypertension</option>
-                <option value="Diabetes">Diabetes</option>
-                <option value="Asthma">Asthma</option>
-                <option value="Heart Disease">Heart Disease</option>
-                <option value="Tuberculosis">Tuberculosis</option>
-                <option value="Arthritis">Arthritis</option>
-                <option value="Allergies">Allergies</option>
-                <option value="Cancer">Cancer</option>
-                <option value="Kidney Disease">Kidney Disease</option>
-                <option value="Liver Disease">Liver Disease</option>
-                <option value="Thyroid Disorder">Thyroid Disorder</option>
-                <option value="Migraine">Migraine</option>
-                <option value="Epilepsy">Epilepsy</option>
-                <option value="Depression">Depression</option>
-                <option value="Anxiety">Anxiety</option>
-                <option value="Stroke">Stroke</option>
-                <option value="COPD">COPD</option>
-                <option value="Pneumonia">Pneumonia</option>
-                <option value="Anemia">Anemia</option>
-                <option value="High Cholesterol">High Cholesterol</option>
-
-            </select>
-
-        </div>
+</div>
 
 
+
+
+
+{{-- ============================================= --}}
+{{-- OTHER CONDITION --}}
+{{-- ============================================= --}}
+<div style="margin-bottom:20px;">
+
+    <label style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+        margin-bottom:10px;
+        font-weight:600;
+    ">
+
+        <input type="checkbox"
+               id="other-condition-checkbox">
+
+        Other Condition
+
+    </label>
+
+    <input type="text"
+           name="other_condition"
+           id="other-condition-input"
+           class="form-input"
+           placeholder="Enter other condition..."
+           style="display:none;">
+
+</div>
 
 
 
@@ -237,5 +294,19 @@
         </p>
 
     @endforelse
+
+
+<script>
+const checkbox = document.getElementById('other-condition-checkbox');
+const input = document.getElementById('other-condition-input');
+
+checkbox.addEventListener('change', () => {
+    input.style.display = checkbox.checked ? 'block' : 'none';
+
+    if (!checkbox.checked) {
+        input.value = '';
+    }
+});
+</script>
 
 </div>

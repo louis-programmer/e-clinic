@@ -30,25 +30,33 @@
                 Procedure
             </label>
 
-            <select name="procedure_id" class="form-input">
+    <select name="procedure_id" class="form-input">
 
-                <option value="">
-                    Select Procedure
+    <option value="">
+        Select Procedure
+    </option>
+
+    @foreach($procedures as $category => $categoryProcedures)
+
+        <optgroup label="{{ ucfirst($category) }}">
+
+            @foreach($categoryProcedures as $procedure)
+
+                <option value="{{ $procedure->id }}">
+
+                    {{ $procedure->name }}
+                    —
+                    ₱{{ number_format($procedure->price, 2) }}
+
                 </option>
 
-                @foreach($procedures as $procedure)
+            @endforeach
 
-                    <option value="{{ $procedure->id }}">
+        </optgroup>
 
-                        {{ $procedure->name }}
-                        —
-                        ₱{{ number_format($procedure->price, 2) }}
+    @endforeach
 
-                    </option>
-
-                @endforeach
-
-            </select>
+</select>
 
             @error('procedure_id')
                 <div style="

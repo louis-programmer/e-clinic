@@ -2,44 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
-use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Invoice;
 
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function store(Request $request, Invoice $invoice)
     {
+        // =====================================================
+        // VALIDATION
+        // =====================================================
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'method' => 'nullable|string|max:50',
-            'notes' => 'nullable|string|max:1000',
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+            ],
+
+            'method' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'notes' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
         ]);
 
-        // 1. Create payment record
-        $invoice->payments()->create([
-            'amount' => $validated['amount'],
-            'method' => $validated['method'] ?? 'cash',
-            'notes' => $validated['notes'] ?? null,
-            'created_by' => auth()->id(),
-        ]);
+        // =====================================================
+        // SAFETY: REFRESH INVOICE (IMPORTANT)
+        // =====================================================
+        $invoice->refresh();
 
-        // 2. Recalculate totals
-        $paid = $invoice->payments()->sum('amount');
+        // =====================================================
+        // OVERPAYMENT CHECK
+        // =====================================================
+        $amount = round($validated['amount'], 2);
+        $balance = round($invoice->balance, 2);
 
-        $invoice->update([
-            'paid_amount' => $paid,
-            'balance' => $invoice->total - $paid,
-            'status' => $paid >= $invoice->total
-                ? 'paid'
-                : ($paid > 0 ? 'partial' : 'unpaid'),
-        ]);
+        if ($amount > $balance) {
+            return back()->with(
+                'error',
+                'Payment exceeds remaining invoice balance. Max allowed: ₱' . number_format($balance, 2)
+            );
+        }
 
-        return back()->with('success', 'Payment recorded successfully');
+        // =====================================================
+        // TRANSACTION: PAYMENT + INVOICE UPDATE
+        // =====================================================
+        DB::transaction(function () use ($validated, $invoice) {
+
+            // Create payment
+            $payment = $invoice->payments()->create([
+                'amount' => $validated['amount'],
+                'method' => $validated['method'],
+                'notes' => $validated['notes'],
+                'created_by' => auth()->id(),
+            ]);
+
+            // Recalculate totals
+            $newPaidAmount = $invoice->paid_amount + $payment->amount;
+            $newBalance = $invoice->total - $newPaidAmount;
+
+            $status = 'partial';
+
+            if ($newBalance <= 0) {
+                $status = 'paid';
+                $newBalance = 0;
+            }
+
+            // Update invoice
+            $invoice->update([
+                'paid_amount' => $newPaidAmount,
+                'balance' => $newBalance,
+                'status' => $status,
+            ]);
+        });
+
+        // =====================================================
+        // SUCCESS RESPONSE
+        // =====================================================
+        return back()->with(
+            'success',
+            'Payment added successfully.'
+        );
     }
 }

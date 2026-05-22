@@ -121,7 +121,11 @@ class PatientController extends Controller
             });
 
             // ✅ ADD THIS HERE (before return)
-            $procedures = Procedure::orderBy('name')->get();
+           $procedures = Procedure::query()
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('category');
 
 
             $progressNotes = $patient->progressNotes()

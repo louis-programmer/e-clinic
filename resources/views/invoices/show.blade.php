@@ -2,6 +2,40 @@
 
 @section('content')
 
+@if(session('error'))
+
+    <div style="
+        background:#fee2e2;
+        border:1px solid #fecaca;
+        color:#991b1b;
+        padding:14px 16px;
+        border-radius:10px;
+        margin-bottom:20px;
+        font-weight:600;
+    ">
+        {{ session('error') }}
+    </div>
+
+@endif
+
+
+
+@if(session('success'))
+
+    <div style="
+        background:#dcfce7;
+        border:1px solid #bbf7d0;
+        color:#166534;
+        padding:14px 16px;
+        border-radius:10px;
+        margin-bottom:20px;
+        font-weight:600;
+    ">
+        {{ session('success') }}
+    </div>
+
+@endif
+
 <div style="
     max-width:1100px;
     margin:auto;
