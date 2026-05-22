@@ -91,5 +91,12 @@ class Patient extends Model
             return $this->hasMany(Invoice::class);
         }
 
+        public function getTotalBalanceAttribute()
+        {
+            return $this->invoices()
+                ->sum('balance');
+        }
+
+
              
 }

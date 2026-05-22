@@ -204,9 +204,9 @@
                             </div>
 
                             {{-- BALANCE --}}
-                            <div>
+                           <div>
                                 <strong>Balance:</strong>
-                                ₱0.00
+                                ₱{{ number_format($patient->total_balance, 2) }}
                             </div>
 
                         </div>
