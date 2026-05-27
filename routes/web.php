@@ -19,6 +19,7 @@ use App\Modules\Patients\Controllers\CheckoutController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 
+use App\Modules\Patients\Controllers\DentalChartController;
 /*
 |--------------------------------------------------------------------------
 | Guest Routes
@@ -142,6 +143,22 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{patient}/medical-history/{history}', [MedicalHistoryController::class, 'destroy'])
             ->name('medical-history.destroy');
 
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dental Chart
+        |--------------------------------------------------------------------------
+        */
+
+          Route::get(
+                '/{patient}/dental-chart',
+                [DentalChartController::class, 'index']
+            )->name('dental-chart.index');
+
+
+            Route::post('/{patient}/dental-chart', [DentalChartController::class, 'store'])
+    ->name('dental-chart.store');
 
     });
 

@@ -23,6 +23,8 @@ class ProgressNoteController extends Controller
     public function store(Request $request, Patient $patient)
     {
 
+          $this->authorize('update', $patient);
+
 
         $validated = $request->validate([
             'procedure_id' => 'required|exists:procedures,id',
@@ -35,6 +37,6 @@ class ProgressNoteController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Progress note saved');
+        return back()->with('SUCCESS!', 'Progress note saved');
     }
 }

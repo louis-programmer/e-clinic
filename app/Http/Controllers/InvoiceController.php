@@ -13,6 +13,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
+         $this->authorize('view', $invoice->patient); // secure
         $invoice->load([
             'patient',
             'items.procedure',

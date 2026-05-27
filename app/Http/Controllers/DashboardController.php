@@ -12,6 +12,7 @@ class DashboardController extends Controller
     public function index()
     {
 
+$clinicId = auth()->user()->clinic_id;
                 /*
         |--------------------------------------------------------------------------
         | Today Birthday
@@ -21,21 +22,25 @@ class DashboardController extends Controller
         $today = Carbon::today();
 
         $birthdayPatients = Patient::query()
+            ->where('clinic_id', auth()->user()->clinic_id)
             ->whereMonth('birthdate', $today->month)
             ->whereDay('birthdate', $today->day)
             ->get();
-
 
         /*
         |--------------------------------------------------------------------------
         | Today Appointments
         |--------------------------------------------------------------------------
         */
-        $todayAppointments = Appointment::with('patient')
-            ->today()
-            ->orderBy('appointment_date')
-            ->get();
-
+$todayAppointments = Appointment::with(['patient' => function ($q) use ($clinicId) {
+        $q->where('clinic_id', $clinicId);
+    }])
+    ->whereHas('patient', function ($q) use ($clinicId) {
+        $q->where('clinic_id', $clinicId);
+    })
+    ->today()
+    ->orderBy('appointment_date')
+    ->get();
         $scheduledCount = $todayAppointments->count();
 
         /*
@@ -51,7 +56,10 @@ class DashboardController extends Controller
         | Monthly Appointments
         |--------------------------------------------------------------------------
         */
-        $appointmentsRaw = Appointment::whereBetween('appointment_date', [
+        $appointmentsRaw = Appointment::whereHas('patient', function ($q) {
+                $q->where('clinic_id', auth()->user()->clinic_id);
+            })
+            ->whereBetween('appointment_date', [
                 $startOfMonth,
                 $endOfMonth
             ])

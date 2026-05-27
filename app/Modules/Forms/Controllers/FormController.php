@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Modules\Forms\Controllers;
-
+use App\Modules\Patients\Models\Patient;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -9,8 +9,11 @@ use App\Modules\Forms\Models\PatientForm;
 
 class FormController extends Controller
 {
-    public function store(Request $request, $patientId)
+   public function store(Request $request, Patient $patient)
     {
+
+        $this->authorize('update', $patient);
+
         $data = $request->validate([
             'title'    => 'required|string|max:255',
             'category' => 'required|string|max:100',
@@ -21,7 +24,7 @@ class FormController extends Controller
         $path = $request->file('file')->store('patient-forms');
 
         PatientForm::create([
-            'patient_id' => $patientId,
+           'patient_id' => $patient->id,
             'title'      => $data['title'],
             'category'   => $data['category'],
             'remarks'    => $data['remarks'] ?? null,
@@ -31,10 +34,12 @@ class FormController extends Controller
         return back()->with('success', 'Form uploaded successfully.');
     }
 
-    public function view($patientId, PatientForm $form)
+   public function view(Patient $patient, PatientForm $form)
     {
+
+        $this->authorize('view', $patient);
         // SECURITY: ensure form belongs to patient
-        if ((int) $form->patient_id !== (int) $patientId) {
+        if ((int) $form->patient_id !== (int) $patient->id){
             abort(403, 'Unauthorized access.');
         }
 
@@ -47,10 +52,12 @@ class FormController extends Controller
         return response()->file($path);
     }
 
-    public function destroy($patientId, PatientForm $form)
+    public function destroy(Patient $patient, PatientForm $form)
     {
+
+         $this->authorize('update', $patient);
         // SECURITY: ensure form belongs to patient
-        if ((int) $form->patient_id !== (int) $patientId) {
+        if ((int) $form->patient_id !== (int) $patient->id) {
             abort(403, 'Unauthorized access.');
         }
 

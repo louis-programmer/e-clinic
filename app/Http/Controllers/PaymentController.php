@@ -10,6 +10,8 @@ class PaymentController extends Controller
 {
     public function store(Request $request, Invoice $invoice)
     {
+
+          $this->authorize('update', $invoice->patient);
         // =====================================================
         // VALIDATION
         // =====================================================

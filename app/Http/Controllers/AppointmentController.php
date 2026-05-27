@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\AppointmentService;
 use App\Modules\Patients\Models\Appointment;
 use App\Enums\AppointmentStatus;
+use App\Modules\Patients\Models\Patient;
 
 class AppointmentController extends Controller
 {
@@ -36,18 +37,23 @@ class AppointmentController extends Controller
     | Store Appointment
     |--------------------------------------------------------------------------
     */
-    public function store(Request $request, $patientId)
-    {
-        $validated = $request->validate([
-            'appointment_date' => 'required|date|after_or_equal:now',
-            'purpose'          => 'nullable|string|max:255',
-            'notes'            => 'nullable|string',
-        ]);
 
-        $this->appointmentService->create($validated, $patientId);
+public function store(Request $request, $patientId)
+{
+    $patient = Patient::findOrFail($patientId);
 
-        return back()->with('success', 'Appointment created successfully.');
-    }
+    $this->authorize('update', $patient);
+
+    $validated = $request->validate([
+        'appointment_date' => 'required|date|after_or_equal:now',
+        'purpose' => 'nullable|string|max:255',
+        'notes' => 'nullable|string',
+    ]);
+
+    $this->appointmentService->create($validated, $patientId);
+
+    return back()->with('success', 'Appointment created successfully.');
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -56,6 +62,7 @@ class AppointmentController extends Controller
     */
     public function complete(Appointment $appointment)
     {
+        $this->authorize('update', $appointment->patient); //secure
         $this->appointmentService->complete($appointment);
 
         return back()->with('success', 'Appointment marked as completed.');
@@ -68,6 +75,7 @@ class AppointmentController extends Controller
     */
     public function reschedule(Request $request, Appointment $appointment)
     {
+        $this->authorize('update', $appointment->patient); //secure
         $validated = $request->validate([
             'appointment_date' => 'required|date|after_or_equal:now',
         ]);
@@ -87,6 +95,7 @@ class AppointmentController extends Controller
     */
     public function cancel(Appointment $appointment)
     {
+        $this->authorize('update', $appointment->patient); // secure
         $this->appointmentService->cancel($appointment);
 
         return back()->with('success', 'Appointment cancelled.');
@@ -99,6 +108,7 @@ class AppointmentController extends Controller
     */
     public function noShow(Appointment $appointment)
     {
+        $this->authorize('update', $appointment->patient); // secure
         $this->appointmentService->noShow($appointment);
 
         return back()->with('success', 'Appointment marked as no_show.');
@@ -111,6 +121,7 @@ class AppointmentController extends Controller
     */
     public function destroy(Appointment $appointment)
     {
+        $this->authorize('update', $appointment->patient);// secure
         // Use enum instead of raw string (IMPORTANT FIX)
         if ($appointment->status === AppointmentStatus::COMPLETED) {
             return back()->with('error', 'Completed appointments cannot be deleted.');

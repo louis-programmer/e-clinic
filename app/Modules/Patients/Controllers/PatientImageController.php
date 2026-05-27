@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Modules\Patients\Controllers;
-
+use App\Modules\Patients\Models\Patient;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modules\Patients\Models\PatientImage;
@@ -30,8 +30,11 @@ class PatientImageController extends Controller
 
     }
 
-        public function store(Request $request, $patientId)
+       public function store(Request $request, Patient $patient)
         {
+
+            $this->authorize('update', $patient);
+
             $validated = $request->validate([
                 'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
                 'type'  => 'required|in:photo,xray',
@@ -49,7 +52,7 @@ class PatientImageController extends Controller
             );
 
             PatientImage::create([
-                'patient_id'  => $patientId,
+                  'patient_id'  => $patient->id,
                 'file_path'   => $path,
                 'uploaded_by' => auth()->id(),
                 'type'        => $type,
@@ -60,11 +63,10 @@ class PatientImageController extends Controller
 
 
 
-        public function destroy($id)
+        public function destroy(PatientImage $image)
         {
-            $image = PatientImage::where('id', $id)
-                ->whereHas('patient') // ensures relation exists
-                ->firstOrFail();
+
+            $this->authorize('update', $image->patient);
 
             if (Storage::disk('public')->exists($image->file_path)) {
                 Storage::disk('public')->delete($image->file_path);

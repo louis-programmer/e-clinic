@@ -4,11 +4,13 @@ namespace App\Modules\Patients\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Modules\Patients\Models\Patient;
+use App\Modules\Patients\Models\Patient; // 
 use Illuminate\Support\Str;
 use App\Enums\AppointmentStatus;
 use App\Modules\Patients\Models\Procedure;
 use App\Modules\Patients\Models\ProgressNote;
+use App\Models\DentalChartRecord;
+use App\Models\PatientTooth;
 
 class PatientController extends Controller
 {
@@ -81,6 +83,9 @@ class PatientController extends Controller
         */
         public function show(Patient $patient)
         {
+
+                $this->authorize('view', $patient); //// policy
+
             $patient->load([
                 'encounters',
                 'images',
@@ -143,6 +148,12 @@ class PatientController extends Controller
                 ->get();
 
 
+                $records = DentalChartRecord::where('patient_id', $patient->id)->get();
+
+                $toothStates = PatientTooth::where('patient_id', $patient->id)
+                    ->get()
+                    ->keyBy('tooth_number');
+
 
             return view('patients.show', compact(
                 'patient',
@@ -150,7 +161,9 @@ class PatientController extends Controller
                 'previousAppointments',
                 'procedures',
                 'progressNotes',
-                'invoices'
+                'invoices',
+                'records',        // ✅ ADD THIS
+                'toothStates'     // ✅ ADD THIS
             ));
         }
 

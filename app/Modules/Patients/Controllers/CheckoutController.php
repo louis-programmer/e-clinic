@@ -12,6 +12,8 @@ class CheckoutController extends Controller
 {
     public function store(Request $request, Patient $patient)
     {
+
+        $this->authorize('update', $patient);
         // =====================================================
         // VALIDATION
         // =====================================================
@@ -80,6 +82,6 @@ class CheckoutController extends Controller
         // =====================================================
         return redirect()
             ->route('patients.show', $patient)
-            ->with('success', 'Checkout / Invoice created successfully');
+            ->with('success!!', 'Checkout / Invoice created successfully');
     }
 }

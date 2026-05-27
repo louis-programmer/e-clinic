@@ -26,10 +26,9 @@ class EncounterController extends Controller
 
 
 
-    public function store(Request $request, $patientId)
+    public function store(Request $request, Patient $patient)
     {
-        $patient = Patient::findOrFail($patientId);
-
+$this->authorize('update', $patient);
         $validated = $request->validate([
             'chief_complaint' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
@@ -40,9 +39,8 @@ class EncounterController extends Controller
 
         $validated['encounter_date'] = $validated['encounter_date'] ?? now();
 
-        $validated['patient_id'] = $patient->id;
+       $patient->encounters()->create($validated);
 
-        Encounter::create($validated);
 
         return redirect()->route('patients.show', $patient->id)
             ->with('success', 'Encounter added successfully');

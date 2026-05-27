@@ -8,7 +8,7 @@ use App\Modules\Patients\Models\PatientImage;
 use App\Modules\Patients\Models\Appointment;
 use App\Modules\Patients\Models\ProgressNote;
 use App\Models\Invoice;
-
+use App\Modules\Patients\Models\DentalChartRecord;
 
 class Patient extends Model
 {
@@ -95,6 +95,11 @@ class Patient extends Model
         {
             return $this->invoices()
                 ->sum('balance');
+        }
+
+        public function dentalChartRecords()
+        {
+            return $this->hasMany(\App\Models\DentalChartRecord::class);
         }
 
 

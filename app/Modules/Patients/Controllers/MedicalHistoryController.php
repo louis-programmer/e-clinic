@@ -30,6 +30,9 @@ class MedicalHistoryController extends Controller
 
 public function store(Request $request, Patient $patient)
 {
+
+    $this->authorize('update', $patient);
+
     $validated = $request->validate([
         'conditions' => ['nullable', 'array'],
         'conditions.*' => ['string', 'max:255'],
@@ -73,6 +76,9 @@ public function store(Request $request, Patient $patient)
     */
     public function destroy(Patient $patient, MedicalHistory $history)
     {
+
+        $this->authorize('update', $patient);
+        
         if ((int) $history->patient_id !== (int) $patient->id) {
             abort(403, 'Unauthorized action.');
         }
