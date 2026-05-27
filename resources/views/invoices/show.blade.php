@@ -117,16 +117,52 @@
                 </div>
             </div>
 
-            <div>
-                <div style="font-size:13px; color:#64748b;">
-                    Total Amount
-                </div>
+         <div>
+    <div style="font-size:13px; color:#64748b;">
+        Subtotal
+    </div>
 
-                <div style="font-weight:600;">
-                    ₱{{ number_format($invoice->total, 2) }}
-                </div>
-            </div>
+    <div style="font-weight:600;">
+        ₱{{ number_format($invoice->subtotal, 2) }}
+    </div>
+</div>
 
+<div>
+    <div style="font-size:13px; color:#64748b;">
+        Discount
+    </div>
+
+    <div style="font-weight:600; color:#16a34a;">
+
+        @if($invoice->discount_type === 'percent')
+
+            {{ rtrim(rtrim(number_format($invoice->discount_value, 2), '0'), '.') }}%
+            (
+            ₱{{ number_format($invoice->discount_amount, 2) }}
+            )
+
+        @elseif($invoice->discount_type === 'fixed')
+
+            ₱{{ number_format($invoice->discount_amount, 2) }}
+
+        @else
+
+            ₱0.00
+
+        @endif
+
+    </div>
+</div>
+
+<div>
+    <div style="font-size:13px; color:#64748b;">
+        Final Total
+    </div>
+
+    <div style="font-weight:700;">
+        ₱{{ number_format($invoice->total, 2) }}
+    </div>
+</div>
             <div>
                 <div style="font-size:13px; color:#64748b;">
                     Paid Amount

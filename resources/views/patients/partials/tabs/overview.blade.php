@@ -37,30 +37,30 @@
         Medical Conditions
     </label>
 
-    @php
-        $conditions = [
-            'Hypertension',
-            'Diabetes',
-            'Asthma',
-            'Heart Disease',
-            'Tuberculosis',
-            'Arthritis',
-            'Allergies',
-            'Cancer',
-            'Kidney Disease',
-            'Liver Disease',
-            'Thyroid Disorder',
-            'Migraine',
-            'Epilepsy',
-            'Depression',
-            'Anxiety',
-            'Stroke',
-            'COPD',
-            'Pneumonia',
-            'Anemia',
-            'High Cholesterol',
-        ];
-    @endphp
+@php
+    $conditions = collect([
+        'Hypertension',
+        'Diabetes',
+        'Asthma',
+        'Heart Disease',
+        'Tuberculosis',
+        'Arthritis',
+        'Allergies',
+        'Cancer',
+        'Kidney Disease',
+        'Liver Disease',
+        'Thyroid Disorder',
+        'Migraine',
+        'Epilepsy',
+        'Depression',
+        'Anxiety',
+        'Stroke',
+        'COPD',
+        'Pneumonia',
+        'Anemia',
+        'High Cholesterol',
+    ])->sort()->values();
+@endphp
 
     <div style="
         display:grid;

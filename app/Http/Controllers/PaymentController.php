@@ -56,34 +56,38 @@ class PaymentController extends Controller
         // =====================================================
         // TRANSACTION: PAYMENT + INVOICE UPDATE
         // =====================================================
-        DB::transaction(function () use ($validated, $invoice) {
+            DB::transaction(function () use ($validated, $invoice) {
 
-            // Create payment
-            $payment = $invoice->payments()->create([
-                'amount' => $validated['amount'],
-                'method' => $validated['method'],
-                'notes' => $validated['notes'],
-                'created_by' => auth()->id(),
-            ]);
+                // IMPORTANT: always refresh inside transaction
+                $invoice->refresh();
 
-            // Recalculate totals
-            $newPaidAmount = $invoice->paid_amount + $payment->amount;
-            $newBalance = $invoice->total - $newPaidAmount;
+                // Create payment
+                $payment = $invoice->payments()->create([
+                    'amount' => $validated['amount'],
+                    'method' => $validated['method'],
+                    'notes' => $validated['notes'],
+                    'created_by' => auth()->id(),
+                ]);
 
-            $status = 'partial';
+                // Recalculate safely
+                $newPaidAmount = $invoice->paid_amount + $payment->amount;
 
-            if ($newBalance <= 0) {
-                $status = 'paid';
-                $newBalance = 0;
-            }
+                // IMPORTANT: discount-safe balance calculation
+                $newBalance = max(0, $invoice->total - $newPaidAmount);
 
-            // Update invoice
-            $invoice->update([
-                'paid_amount' => $newPaidAmount,
-                'balance' => $newBalance,
-                'status' => $status,
-            ]);
-        });
+                $status = 'partial';
+
+                if ($newBalance <= 0) {
+                    $status = 'paid';
+                    $newBalance = 0;
+                }
+
+                $invoice->update([
+                    'paid_amount' => $newPaidAmount,
+                    'balance' => $newBalance,
+                    'status' => $status,
+                ]);
+            });
 
         // =====================================================
         // SUCCESS RESPONSE

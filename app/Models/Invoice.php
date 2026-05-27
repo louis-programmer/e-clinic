@@ -10,18 +10,23 @@ use App\Models\InvoiceItem;
 
 class Invoice extends Model
 {
-    protected $fillable = [
-        'patient_id',
-        'invoice_number',
-        'subtotal',
-        'total',
-        'paid_amount',
-        'balance',
-        'status',
-        'remarks',
-        'created_by',
+protected $fillable = [
+    'patient_id',
+    'invoice_number',
 
-    ];
+    'subtotal',
+
+    'discount_amount',
+    'discount_type',
+    'discount_value',
+
+    'total',
+    'paid_amount',
+    'balance',
+    'status',
+    'remarks',
+    'created_by',
+];
 
     public function items()
     {

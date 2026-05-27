@@ -125,6 +125,57 @@
 
         </div>
 
+{{-- ===================================================== --}}
+{{-- DISCOUNT --}}
+{{-- ===================================================== --}}
+<div style="margin-bottom:14px;">
+
+    <label style="
+        display:block;
+        margin-bottom:6px;
+        font-weight:600;
+    ">
+        Discount Type
+    </label>
+
+    <select name="discount_type" class="form-input">
+
+        <option value="">
+            No Discount
+        </option>
+
+        <option value="percent">
+            Percent (%)
+        </option>
+
+        <option value="fixed">
+            Fixed Amount (₱)
+        </option>
+
+    </select>
+
+</div>
+
+<div style="margin-bottom:20px;">
+
+    <label style="
+        display:block;
+        margin-bottom:6px;
+        font-weight:600;
+    ">
+        Discount Value
+    </label>
+
+    <input
+        type="number"
+        name="discount_value"
+        class="form-input"
+        placeholder="Enter discount"
+        min="0"
+        step="0.01"
+    >
+
+</div>
         {{-- ===================================================== --}}
         {{-- CHECKOUT SUMMARY (PLACEHOLDER) --}}
         {{-- ===================================================== --}}
