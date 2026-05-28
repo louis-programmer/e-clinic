@@ -317,10 +317,14 @@
 
     <div style="margin-bottom:10px;">
         <label style="font-weight:600;">Payment Method</label>
-        <input type="text"
-               name="method"
-               class="form-input"
-               placeholder="cash / gcash / card">
+        <select name="method" class="form-input" required>
+            <option value="">-- Select Payment Method --</option>
+            <option value="cash">Cash</option>
+            <option value="gcash">GCash</option>
+            <option value="card">Card</option>
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="cheque">Cheque</option>
+</select>
     </div>
 
     <div style="margin-bottom:10px;">

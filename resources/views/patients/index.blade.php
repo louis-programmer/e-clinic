@@ -53,14 +53,37 @@
             flex-wrap:wrap;
         ">
 
-            {{-- SEARCH --}}
-            <input type="text"
-                   placeholder="Search patient..."
-                   class="form-input"
-                   style="
-                        width:220px;
-                        margin:0;
-                   ">
+           {{-- SEARCH --}}
+             <form method="GET"
+              action="{{ route('patients.index') }}"
+              id="patient-search-form"
+              style="
+                    display:flex;
+                    gap:8px;
+                    align-items:center;
+              ">
+
+                    <input type="text"
+                       id="patient-search-input"
+                       name="search"
+                       value="{{ $search ?? '' }}"
+                       placeholder="Search patient..."
+                           class="form-input"
+                           style="
+                                width:220px;
+                                margin:0;
+                           ">
+
+                            <button class="btn" type="submit">
+                                Search
+                            </button>
+
+                            <button type="button"
+                                    id="clear-search-btn"
+                                    class="btn btn-secondary">
+                                Clear
+                            </button>
+                </form>
 
 
 
@@ -253,5 +276,46 @@
     @endforelse
 
 </div>
+<script>
+
+    // =====================================================
+    // LIVE SEARCH
+    // =====================================================
+
+   // let searchTimeout;
+
+    const searchInput = document.getElementById('patient-search-input');
+    const searchForm = document.getElementById('patient-search-form');
+    const clearButton = document.getElementById('clear-search-btn');
+
+    // -----------------------------------------------------
+    // LIVE SEARCH
+    // -----------------------------------------------------
+/*
+    searchInput.addEventListener('input', function () {
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(function () {
+
+            searchForm.submit();
+
+        }, 500);
+
+    });
+*/
+    // -----------------------------------------------------
+    // CLEAR SEARCH
+    // -----------------------------------------------------
+
+    clearButton.addEventListener('click', function () {
+
+        searchInput.value = '';
+
+        window.location = "{{ route('patients.index') }}";
+
+    });
+
+</script>
 
 @endsection

@@ -37,17 +37,39 @@ class PatientController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | LIST
+    | LIST Upgraded with search
     |--------------------------------------------------------------------------
     */
-    public function index()
-    {
-        $patients = Patient::query()
-            ->latest()
-            ->paginate(10);
+        public function index(Request $request)
+        {
+            $search = trim($request->get('search'));
 
-        return view('patients.index', compact('patients'));
-    }
+            $patients = Patient::query()
+
+                ->when($search, function ($query) use ($search) {
+
+                    $query->where(function ($q) use ($search) {
+
+                        $q->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('middle_name', 'like', "%{$search}%")
+                            ->orWhere('contact_number', 'like', "%{$search}%");
+
+                    });
+
+                })
+
+                ->latest()
+                ->paginate(10)
+
+                // IMPORTANT
+                ->withQueryString();
+
+            return view('patients.index', compact(
+                'patients',
+                'search'
+            ));
+        }
 
     /*
     |--------------------------------------------------------------------------

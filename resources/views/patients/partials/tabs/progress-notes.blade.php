@@ -81,18 +81,55 @@
                         {{ $procedure->name }}
                     </div>
 
-                    <div style="
-                        font-size:12px;
-                        color:#64748b;
-                    ">
-                        ₱{{ number_format($procedure->price, 2) }}
-                    </div>
+                   @if(!config('procedures.manual_price_enabled'))
+
+                        <div style="
+                            font-size:12px;
+                            color:#64748b;
+                        ">
+                           @if(!config('procedures.manual_price_enabled'))
+                                ₱{{ number_format($procedure->price, 2) }}
+                            @else
+                                <span style="color:#94a3b8;">Override enabled</span>
+                            @endif
+                        </div>
+
+                    @endif
 
                 </div>
 
-                <input type="checkbox"
-                       name="procedures[]"
-                       value="{{ $procedure->id }}">
+                         <div style="
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                            ">
+
+                               <input type="checkbox"
+                                    class="procedure-checkbox"
+                                    data-id="{{ $procedure->id }}"
+                                    data-price="{{ $procedure->price }}"
+                                    name="procedures[]"
+                                    value="{{ $procedure->id }}">
+
+                                @if(config('procedures.manual_price_enabled'))
+
+                                    <input type="number"
+                                           name="custom_prices[{{ $procedure->id }}]"
+                                           class="form-input"
+                                           placeholder="Override"
+                                           step="0.01"
+                                           min="0"
+                                           style="
+                                                width:110px;
+                                                margin:0;
+                                           ">
+
+                                @endif
+
+                            </div>
+                                                   
+
+
             </label>
 
         @endforeach
@@ -103,7 +140,56 @@
 
         </div>
 
-     
+<div id="custom-procedures-container"
+     style="
+        margin-top:20px;
+        padding:12px;
+        border:1px dashed #cbd5e1;
+        border-radius:8px;
+     ">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="font-weight:600;">
+            Others (Manual Procedures)
+        </div>
+
+        <button type="button"
+                id="add-custom-procedure-btn"
+                style="
+                    padding:6px 10px;
+                    font-size:12px;
+                    border:1px solid #cbd5e1;
+                    background:white;
+                    border-radius:6px;
+                    cursor:pointer;
+                ">
+            + Add Another
+        </button>
+    </div>
+
+    <div id="custom-rows">
+
+        <div class="custom-row" style="margin-bottom:10px;">
+
+            <input type="text"
+                   name="custom_procedure_name[]"
+                   class="form-input"
+                   placeholder="Procedure name">
+
+            <input type="number"
+                   name="custom_procedure_price[]"
+                   class="form-input custom-price"
+                   placeholder="Price"
+                   step="0.01"
+                   min="0"
+                   style="margin-top:6px;">
+
+        </div>
+
+    </div>
+
+</div>
+
 
         {{-- ===================================================== --}}
         {{-- REMARKS --}}
@@ -138,7 +224,9 @@
         Discount Type
     </label>
 
-    <select name="discount_type" class="form-input">
+            <select
+            name="discount_type"
+            id="discount-type" class="form-input">
 
         <option value="">
             No Discount
@@ -166,14 +254,15 @@
         Discount Value
     </label>
 
-    <input
-        type="number"
-        name="discount_value"
-        class="form-input"
-        placeholder="Enter discount"
-        min="0"
-        step="0.01"
-    >
+           <input
+            type="number"
+            name="discount_value"
+            id="discount-value"
+                class="form-input"
+                placeholder="Enter discount"
+                min="0"
+                step="0.01"
+            >
 
 </div>
         {{-- ===================================================== --}}
@@ -205,7 +294,9 @@
                 margin-top:10px;
                 font-weight:600;
             ">
-                Estimated Total: ₱0.00
+                Estimated Total:
+                <span id="checkout-total">₱0.00</span>
+
                 <small style="color:#64748b;">(to be computed)</small>
             </div>
 
@@ -381,3 +472,204 @@
 
 @endforelse
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
+    const checkboxes = document.querySelectorAll('.procedure-checkbox');
+    const totalDisplay = document.getElementById('checkout-total');
+
+    const discountType = document.getElementById('discount-type');
+    const discountValue = document.getElementById('discount-value');
+
+    const addBtn = document.getElementById('add-custom-procedure-btn');
+    const customContainer = document.getElementById('custom-rows');
+
+    // =====================================================
+    // CORE TOTAL ENGINE
+    // =====================================================
+    function updateCheckoutTotal() {
+
+        let subtotal = 0;
+
+        // -------------------------------------------------
+        // PROCEDURES
+        // -------------------------------------------------
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                const manualEnabled = @json(config('procedures.manual_price_enabled'));
+
+                    checkboxes.forEach(cb => {
+
+                        if (!cb.checked) return;
+
+                        const id = cb.dataset.id;
+
+                        let price = parseFloat(cb.dataset.price) || 0;
+
+                        // -------------------------------------------------
+                        // OVERRIDE MODE
+                        // -------------------------------------------------
+                        if (manualEnabled) {
+
+                            const overrideInput = document.querySelector(
+                                `input[name="custom_prices[${id}]"]`
+                            );
+
+                            if (overrideInput && overrideInput.value !== '') {
+                                price = parseFloat(overrideInput.value) || 0;
+                            }
+                        }
+
+                        subtotal += price;
+                    });
+            }
+        });
+
+        // -------------------------------------------------
+        // CUSTOM PROCEDURES (MULTIPLE ROWS)
+        // -------------------------------------------------
+        const customPrices = document.querySelectorAll('.custom-price');
+
+        customPrices.forEach(input => {
+            subtotal += parseFloat(input.value) || 0;
+        });
+
+        // -------------------------------------------------
+        // DISCOUNT
+        // -------------------------------------------------
+        let total = subtotal;
+
+        const type = discountType.value;
+        const value = parseFloat(discountValue.value) || 0;
+
+        if (type === 'percent') {
+            total -= (subtotal * value / 100);
+        }
+
+        if (type === 'fixed') {
+            total -= value;
+        }
+
+        if (total < 0) total = 0;
+
+        // -------------------------------------------------
+        // OUTPUT
+        // -------------------------------------------------
+        totalDisplay.innerText = '₱' + total.toFixed(2);
+    }
+
+    // =====================================================
+    // PROCEDURE EVENTS
+    // =====================================================
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateCheckoutTotal);
+    });
+
+    // =====================================================
+    // DISCOUNT EVENTS
+    // =====================================================
+    discountType.addEventListener('change', updateCheckoutTotal);
+    discountValue.addEventListener('input', updateCheckoutTotal);
+
+    // =====================================================
+    // CUSTOM ROW EVENTS (LIVE)
+    // =====================================================
+    document.addEventListener('input', function (e) {
+        if (e.target.classList.contains('custom-price')) {
+            updateCheckoutTotal();
+        }
+    });
+
+    // =====================================================
+    // ADD NEW CUSTOM ROW
+    // =====================================================
+    if (addBtn) {
+        addBtn.addEventListener('click', function () {
+
+            const row = document.createElement('div');
+            row.classList.add('custom-row');
+            row.style.marginBottom = '10px';
+
+            row.innerHTML = `
+                <input type="text"
+                       name="custom_procedure_name[]"
+                       class="form-input"
+                       placeholder="Procedure name">
+
+                <input type="number"
+                       name="custom_procedure_price[]"
+                       class="form-input custom-price"
+                       placeholder="Price"
+                       step="0.01"
+                       min="0"
+                       style="margin-top:6px;">
+
+                <button type="button"
+                        class="remove-row"
+                        style="
+                            margin-top:6px;
+                            padding:4px 8px;
+                            font-size:11px;
+                            border:1px solid #ef4444;
+                            background:white;
+                            color:#ef4444;
+                            border-radius:6px;
+                            cursor:pointer;
+                        ">
+                    Remove
+                </button>
+            `;
+
+            customContainer.appendChild(row);
+
+            // remove handler
+            row.querySelector('.remove-row').addEventListener('click', function () {
+                row.remove();
+                updateCheckoutTotal();
+            });
+
+        });
+    }
+
+    // =====================================================
+    // INITIAL CALC
+    // =====================================================
+    updateCheckoutTotal();
+
+});
+</script>
+
+
+<script>
+document.querySelector('form').addEventListener('submit', function (e) {
+
+    const rows = document.querySelectorAll('.custom-row');
+
+    let hasError = false;
+
+    rows.forEach(row => {
+
+        const nameInput = row.querySelector('input[name="custom_procedure_name[]"]');
+        const priceInput = row.querySelector('input[name="custom_procedure_price[]"]');
+
+        const name = nameInput.value.trim();
+        const price = parseFloat(priceInput.value);
+
+        // If price exists but no name → BLOCK
+        if ((priceInput.value !== '' && !isNaN(price) && price > 0) && name === '') {
+            hasError = true;
+
+            nameInput.style.border = "2px solid #ef4444";
+            nameInput.placeholder = "⚠ Required if price is set";
+        }
+    });
+
+    if (hasError) {
+        e.preventDefault();
+        alert("Please name all 'Others' procedures before continuing.");
+    }
+});
+</script>
