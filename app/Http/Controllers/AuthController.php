@@ -32,41 +32,41 @@ class AuthController extends Controller
     {
         // 1. Validate input
         $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+            'username' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
         // 2. Rate limiting key
         $key = 'login:' . $request->ip();
 
-        // 3. Too many attempts protection (IMPORTANT SECURITY FIX)
+        // 3. Too many attempts protection
         if (RateLimiter::tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
-                'email' => 'Too many login attempts. Please try again later.',
+                'username' => 'Too many login attempts. Please try again later.',
             ]);
         }
 
         // 4. Attempt login
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt([
+            'username' => $credentials['username'],
+            'password' => $credentials['password'],
+        ])) {
 
-            // reset rate limiter on success
             RateLimiter::clear($key);
 
-            // regenerate session (prevents session fixation)
             $request->session()->regenerate();
 
-            // OPTIONAL: role-based redirect hook (safe fallback kept)
             return redirect('/loading');
         }
 
-        // 5. Increment failed attempts
-        RateLimiter::hit($key, 60); // lock for 60 seconds window behavior
+        // 5. FAILED LOGIN → increment attempts
+        RateLimiter::hit($key, 60);
 
         return back()
             ->withErrors([
-                'email' => 'Invalid credentials.',
+                'username' => 'Invalid credentials.',
             ])
-            ->onlyInput('email');
+            ->onlyInput('username');
     }
 
     /*

@@ -16,12 +16,35 @@ class FormController extends Controller
 
         $data = $request->validate([
             'title'    => 'required|string|max:255',
-            'category' => 'required|string|max:100',
+            'category' => [
+                'required',
+                'in:Consent Form,Medical Clearance,X-Ray,Lab Result,Prescription,Referral,Insurance,Other',
+            ],
             'remarks'  => 'nullable|string',
-            'file'     => 'required|file|max:5120|mimes:jpg,jpeg,png,pdf',
+            'file' => [
+                    'required',
+                    'file',
+                    'max:10240',
+
+                    // extensions
+                    'mimes:jpg,jpeg,png,pdf',
+
+                    // actual mime type
+                    'mimetypes:image/jpeg,image/png,application/pdf',
+                ],
         ]);
 
-        $path = $request->file('file')->store('patient-forms');
+        $filename =
+                    uniqid('form_') .
+                    '_' .
+                    time() .
+                    '.' .
+                    $request->file('file')->getClientOriginalExtension();
+
+                $path = $request->file('file')->storeAs(
+                    'patient-forms',
+                    $filename
+                );
 
         PatientForm::create([
            'patient_id' => $patient->id,

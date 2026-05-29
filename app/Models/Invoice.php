@@ -25,6 +25,7 @@ protected $fillable = [
     'balance',
     'status',
     'remarks',
+    'signature_path',
     'created_by',
 ];
 

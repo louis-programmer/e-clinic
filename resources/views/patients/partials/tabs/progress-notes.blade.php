@@ -1,6 +1,19 @@
 {{-- ===================================================== --}}
 {{-- PROCEDURE CHECKOUT / PROGRESS NOTE --}}
 {{-- ===================================================== --}}
+
+<style>
+<style>
+
+/* Make sure pagination text is visible */
+.pagination a,
+.pagination span {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+</style>
+</style>
 <div class="card">
 
     <div style="
@@ -302,12 +315,94 @@
 
         </div>
 
-        {{-- ===================================================== --}}
-        {{-- SUBMIT --}}
-        {{-- ===================================================== --}}
-        <button class="btn btn-primary">
-            + Create Checkout Entry
+
+{{-- ===================================================== --}}
+{{-- PATIENT SIGNATURE --}}
+{{-- ===================================================== --}}
+<div style="
+    margin-bottom:20px;
+">
+
+    <label style="
+        display:block;
+        margin-bottom:8px;
+        font-weight:600;
+    ">
+        Patient Signature
+    </label>
+
+    <canvas
+        id="signature-pad"
+        width="500"
+        height="200"
+        style="
+            border:1px solid #cbd5e1;
+            border-radius:8px;
+            background:white;
+            touch-action:none;
+        "
+    ></canvas>
+
+    <input
+        type="hidden"
+        name="signature"
+        id="signature-input"
+    >
+
+    <div style="
+        margin-top:10px;
+        display:flex;
+        gap:10px;
+    ">
+
+        <button
+            type="button"
+            id="clear-signature-btn"
+            style="
+                padding:8px 12px;
+                border:1px solid #cbd5e1;
+                background:white;
+                border-radius:6px;
+                cursor:pointer;
+            "
+        >
+            Clear Signature
         </button>
+
+    </div>
+
+</div>
+
+
+{{-- ===================================================== --}}
+{{-- ACTION BUTTONS --}}
+{{-- ===================================================== --}}
+<div style="
+    display:flex;
+    gap:10px;
+    align-items:center;
+">
+
+    <button type="submit" class="btn btn-primary">
+        + Create Checkout Entry
+    </button>
+
+    <button
+        type="button"
+        id="clear-checkout-btn"
+        style="
+            padding:10px 16px;
+            border:1px solid #cbd5e1;
+            background:white;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:600;
+        "
+    >
+        Clear
+    </button>
+
+</div>
 
     </form>
 
@@ -325,6 +420,8 @@
     <h3 style="margin-top:0;">
         Progress & Checkout History
     </h3>
+
+    {{ $invoices->links('pagination::simple-default') }}
 
 @forelse($invoices as $invoice)
 
@@ -471,8 +568,12 @@
     </div>
 
 @endforelse
+
+{{ $invoices->links('pagination::simple-default') }}
 </div>
 <script>
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // =====================================================
@@ -637,6 +738,75 @@ document.addEventListener('DOMContentLoaded', function () {
     // =====================================================
     // INITIAL CALC
     // =====================================================
+
+    // =====================================================
+// CLEAR BUTTON
+// =====================================================
+const clearBtn = document.getElementById('clear-checkout-btn');
+
+if (clearBtn) {
+
+    clearBtn.addEventListener('click', function () {
+
+        // -------------------------------------------------
+        // UNCHECK PROCEDURES
+        // -------------------------------------------------
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+
+        // -------------------------------------------------
+        // CLEAR OVERRIDE PRICES
+        // -------------------------------------------------
+        document.querySelectorAll('input[name^="custom_prices"]').forEach(input => {
+            input.value = '';
+        });
+
+        // -------------------------------------------------
+        // CLEAR DISCOUNT
+        // -------------------------------------------------
+        discountType.value = '';
+        discountValue.value = '';
+
+        // -------------------------------------------------
+        // RESET CUSTOM PROCEDURES
+        // -------------------------------------------------
+        customContainer.innerHTML = `
+            <div class="custom-row" style="margin-bottom:10px;">
+
+                <input type="text"
+                       name="custom_procedure_name[]"
+                       class="form-input"
+                       placeholder="Procedure name">
+
+                <input type="number"
+                       name="custom_procedure_price[]"
+                       class="form-input custom-price"
+                       placeholder="Price"
+                       step="0.01"
+                       min="0"
+                       style="margin-top:6px;">
+
+            </div>
+        `;
+
+        // -------------------------------------------------
+        // CLEAR REMARKS
+        // -------------------------------------------------
+        const remarks = document.querySelector('textarea[name="remarks"]');
+
+        if (remarks) {
+            remarks.value = '';
+        }
+
+        // -------------------------------------------------
+        // RECALCULATE
+        // -------------------------------------------------
+        updateCheckoutTotal();
+
+    });
+
+}
     updateCheckoutTotal();
 
 });
@@ -672,4 +842,146 @@ document.querySelector('form').addEventListener('submit', function (e) {
         alert("Please name all 'Others' procedures before continuing.");
     }
 });
+</script>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
+    const canvas = document.getElementById('signature-pad');
+    const clearBtn = document.getElementById('clear-signature-btn');
+    const signatureInput = document.getElementById('signature-input');
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // =====================================================
+    // DRAWING SETTINGS
+    // =====================================================
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+
+    let drawing = false;
+
+    // =====================================================
+    // MOUSE EVENTS
+    // =====================================================
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+
+    // =====================================================
+    // TOUCH EVENTS
+    // =====================================================
+    canvas.addEventListener('touchstart', startTouchDraw);
+    canvas.addEventListener('touchmove', touchDraw);
+    canvas.addEventListener('touchend', stopDraw);
+
+    function startDraw(e) {
+
+        drawing = true;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            e.offsetX,
+            e.offsetY
+        );
+    }
+
+    function draw(e) {
+
+        if (!drawing) return;
+
+        ctx.lineTo(
+            e.offsetX,
+            e.offsetY
+        );
+
+        ctx.stroke();
+
+        updateSignatureInput();
+    }
+
+    function stopDraw() {
+
+        drawing = false;
+
+    }
+
+    // =====================================================
+    // TOUCH SUPPORT
+    // =====================================================
+    function getTouchPos(touch) {
+
+        const rect = canvas.getBoundingClientRect();
+
+        return {
+            x: touch.clientX - rect.left,
+            y: touch.clientY - rect.top
+        };
+    }
+
+    function startTouchDraw(e) {
+
+        e.preventDefault();
+
+        drawing = true;
+
+        const pos = getTouchPos(e.touches[0]);
+
+        ctx.beginPath();
+
+        ctx.moveTo(pos.x, pos.y);
+    }
+
+    function touchDraw(e) {
+
+        e.preventDefault();
+
+        if (!drawing) return;
+
+        const pos = getTouchPos(e.touches[0]);
+
+        ctx.lineTo(pos.x, pos.y);
+
+        ctx.stroke();
+
+        updateSignatureInput();
+    }
+
+    // =====================================================
+    // SAVE IMAGE TO HIDDEN INPUT
+    // =====================================================
+    function updateSignatureInput() {
+
+        signatureInput.value = canvas.toDataURL('image/png');
+
+    }
+
+    // =====================================================
+    // CLEAR
+    // =====================================================
+    clearBtn.addEventListener('click', function () {
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        signatureInput.value = '';
+
+    });
+
+});
+
 </script>

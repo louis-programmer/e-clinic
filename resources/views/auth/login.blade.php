@@ -118,33 +118,24 @@
 
             @csrf
 
-            {{-- EMAIL --}}
-            <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value="{{ old('email') }}"
-                required
-
-                style="
-                    width:100%;
-
-                    padding:12px;
-                    margin-bottom:10px;
-
-                    border-radius:10px;
-
-                    border:1px solid rgba(255,255,255,0.35);
-
-                    background:rgba(255,255,255,0.22);
-
-                    color:#fff;
-
-                    font-size:15px;
-
-                    outline:none;
-                "
-            >
+            {{-- uname --}}
+           <input
+    type="text"
+    name="username"
+    placeholder="Username"
+    required
+    style="
+        width:100%;
+        padding:12px;
+        margin-bottom:10px;
+        border-radius:10px;
+        border:1px solid rgba(255,255,255,0.35);
+        background:rgba(255,255,255,0.22);
+        color:#fff;
+        font-size:15px;
+        outline:none;
+    "
+>
 
             {{-- PASSWORD --}}
             <input

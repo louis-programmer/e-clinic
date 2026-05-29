@@ -42,14 +42,22 @@ class PatientImageController extends Controller
 
             $type = $validated['type'];
 
+            if (!in_array($type, ['photo', 'xray'])) {
+                    abort(422, 'Invalid image type');
+                }
+
             // safer filename
             $filename = uniqid() . '_' . time() . '.' . $request->file('image')->getClientOriginalExtension();
 
-            $path = $request->file('image')->storeAs(
-                'patient_images',
-                $filename,
-                'public'
-            );
+                $folder = $type === 'xray'
+                    ? 'patients/xrays'
+                    : 'patients/photos';
+
+                $path = $request->file('image')->storeAs(
+                    $folder,
+                    $filename,
+                    'public'
+                );
 
             PatientImage::create([
                   'patient_id'  => $patient->id,

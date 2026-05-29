@@ -35,6 +35,8 @@ class CheckoutController extends Controller
 
             'discount_type' => 'nullable|in:percent,fixed',
             'discount_value' => 'nullable|numeric|min:0|max:100000',
+            'signature' => 'nullable|string',
+
         ]);
 
         if (
@@ -49,7 +51,7 @@ class CheckoutController extends Controller
             $validated['discount_value'] = 100;
         }
 
-        DB::transaction(function () use ($validated, $patient) {
+        DB::transaction(function () use ($validated, $patient, $request) {
 
             // =====================================================
             // FETCH DATA
@@ -130,6 +132,40 @@ class CheckoutController extends Controller
             // =====================================================
             // CREATE INVOICE
             // =====================================================
+
+            $signaturePath = null;
+
+                if (!empty($validated['signature'])) {
+
+                    $signatureData = $validated['signature'];
+
+                    // remove base64 header
+                    $signatureData = preg_replace(
+                        '#^data:image/\w+;base64,#i',
+                        '',
+                        $signatureData
+                    );
+
+                    $signatureBinary = base64_decode($signatureData);
+
+                    if ($signatureBinary !== false) {
+
+                        $filename =
+                            'signature_' .
+                            uniqid() .
+                            '_' .
+                            time() .
+                            '.png';
+
+                        $path = 'invoice-signatures/' . $filename;
+
+                        \Storage::put($path, $signatureBinary);
+
+                        $signaturePath = $path;
+                    }
+                }
+
+
             $invoice = $patient->invoices()->create([
                 'invoice_number' => 'INV-' . now()->format('YmdHis'),
                 'subtotal' => $subtotal,
@@ -141,6 +177,7 @@ class CheckoutController extends Controller
                 'paid_amount' => 0,
                 'status' => 'unpaid',
                 'remarks' => $validated['remarks'] ?? null,
+                'signature_path' => $signaturePath,
                 'created_by' => auth()->id(),
             ]);
 

@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Models\Modules\Patients\Models;
+namespace App\Modules\Patients\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 
 class PatientImage extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'patient_id',
         'file_path',
@@ -22,13 +25,20 @@ class PatientImage extends Model
 
     public function uploader()
     {
-        return $this->belongsTo(\App\Models\User::class, 'uploaded_by');
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    public function images()
+    // =====================================================
+    // SCOPES
+    // =====================================================
+
+    public function scopePhotos($query)
     {
-        return $this->hasMany(PatientImage::class);
+        return $query->where('type', 'photo');
     }
 
-
+    public function scopeXrays($query)
+    {
+        return $query->where('type', 'xray');
+    }
 }

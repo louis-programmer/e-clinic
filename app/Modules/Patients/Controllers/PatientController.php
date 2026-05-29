@@ -156,18 +156,14 @@ class PatientController extends Controller
 
 
             $progressNotes = $patient->progressNotes()
-                ->with([
-                    'procedure',
-                ])
+                ->with(['procedure'])
                 ->latest()
-                ->get();
+                ->paginate(10);
 
-            $invoices = $patient->invoices()
-                ->with([
-                    'items',
-                ])
+              $invoices = $patient->invoices()
+                ->with(['items'])
                 ->latest()
-                ->get();
+                ->paginate(5);
 
 
                 $records = DentalChartRecord::where('patient_id', $patient->id)->get();
