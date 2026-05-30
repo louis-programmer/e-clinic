@@ -5,7 +5,7 @@
 <!-- ===================================================== -->
 <!-- PATIENT HEADER -->
 <!-- ===================================================== -->
-<div class="card" style="
+<div class="cardHeader" style="
     margin-bottom:20px;
     display:flex;
     gap:25px;

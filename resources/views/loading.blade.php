@@ -4,7 +4,7 @@
     <title>Loading - E-Clinic</title>
 
     {{-- AUTO REDIRECT AFTER 3 SECONDS --}}
-    <meta http-equiv="refresh" content="3;url=/" />
+    <meta http-equiv="refresh" content="8;url=/" />
 
     {{-- FONT --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -149,11 +149,11 @@
             }
 
             25%,49%{
-                content:'Loading Resources';
+                content:'Connecting to Server';
             }
 
             50%,74%{
-                content:'Connecting to Database';
+                content:'Loading Resources';
             }
 
             75%,100%{
@@ -325,27 +325,27 @@
         @keyframes countryFlash{
 
             0%{
-                content:'Dubai';
+                content:'Hong Kong (GMT+8)';
             }
 
             20%{
-                content:'China';
+                content:'Singapore (GMT+8)';
             }
 
             40%{
-                content:'America';
+                content:'Taiwan (GMT+8)';
             }
 
             60%{
-                content:'Japan';
+                content:'Japan (GMT+9)';
             }
 
             80%{
-                content:'Russia';
+                content:'Malaysia (GMT+8)';
             }
 
             100%{
-                content:'Dubai';
+                content:'Philippines (GMT+8)';
             }
         }
 
@@ -421,10 +421,10 @@
         </div>
 
     {{-- GMT TIME --}}
-{{-- PH TIME --}}
-<div class="gmt-time" id="ph-time">
-    PH TIME: Loading...
-</div>
+        {{-- PH TIME --}}
+        <div class="gmt-time" id="ph-time">
+            PH TIME: Loading...
+        </div>
 
         {{-- COPYRIGHT --}}
         <div class="footer">

@@ -123,7 +123,10 @@ textarea {
 <aside class="app-sidebar">
 
     <div class="app-sidebar-brand">
-        <h2>E-Clinic</h2>
+       
+        <a href="/" class="nav-item {{ request()->is('/') ? : '' }}">
+             <h2>E-Clinic</h2>
+        </a>
     </div>
 
     <nav class="app-sidebar-nav">
@@ -142,17 +145,107 @@ textarea {
 
     </nav>
 
+<style>
+    .app-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+</style>
+{{-- SIDEBAR BOTTOM LOGO --}}
+<div style="
+    margin-top:auto;
+    padding:16px;
+    display:flex;
+    justify-content:center;
+">
+
+    <div style="
+        width:106px;
+        height:111px;
+
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:12px;
+
+        background:rgba(255,255,255,0.05);
+
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+    ">
+
+        <img
+            src="{{ asset('images/minimal Icon.png') }}"
+            style="
+                width:60px;
+                opacity:0.35;
+                object-fit:contain;
+            "
+        >
+
+        <div style="
+            margin-top:6px;
+            font-size:9px;
+            color:rgba(255,255,255,0.6);
+            text-align:center;
+            letter-spacing:1px;
+        ">
+            Wilhelm &amp; Clark 2026
+        </div>
+
+    </div>
+
+</div>
+
 </aside>
 
 
-<!-- TOPBAR -->
-<header class="app-topbar">
 
+
+<!-- TOPBAR -->
+<header class="app-topbar" style="display:flex; align-items:center; justify-content:space-between;">
+
+    {{-- LEFT --}}
     <div class="app-topbar-title">
         <strong>Dashboard</strong>
     </div>
 
-    <div class="app-topbar-actions">
+{{-- CENTER (SEARCH + BUTTON) --}}
+<div style="flex:1; display:flex; justify-content:center; gap:8px;">
+
+    <input
+        type="text"
+        placeholder="Search..."
+        style="
+            padding:8px 12px;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            outline:none;
+            font-size:14px;
+            width:250px;
+        "
+    >
+
+    <button
+        type="button"
+        style="
+            padding:8px 12px;
+            border:none;
+            border-radius:8px;
+            background:#3b82f6;
+            color:white;
+            font-size:14px;
+            cursor:pointer;
+        "
+    >
+        Search
+    </button>
+
+</div>
+
+    {{-- RIGHT --}}
+    <div class="app-topbar-actions" style="display:flex; align-items:center; gap:12px;">
 
         @auth
             <span class="user-name">{{ auth()->user()->name }}</span>
@@ -166,7 +259,6 @@ textarea {
     </div>
 
 </header>
-
 
 <!-- MAIN CONTENT -->
 <main class="app-content">

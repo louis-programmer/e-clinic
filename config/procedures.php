@@ -10,6 +10,6 @@ return [
     | false = always use fixed DB prices
     */
 
-    'manual_price_enabled' => false,
+    'manual_price_enabled' => true,
 
 ];

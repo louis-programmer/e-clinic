@@ -1,23 +1,405 @@
 @extends('layouts.app')
 
 @section('content')
+{{-- ===================================================== --}}
+{{-- WATERMARK LOGO (CIRCULAR + SAFE BOX) --}}
+{{-- ===================================================== --}}
+
+<div style="
+    position:fixed;
+    top:50%;
+    left:55%;
+    transform:translate(-50%, -50%);
+
+    z-index:0;
+    pointer-events:none;
+
+    opacity:0.03;
+">
+
+    <div style="
+        width:420px;
+        height:420px;
+
+        border-radius:50%;
+
+        display:flex;
+        justify-content:center;
+        align-items:center;
+
+        overflow:hidden;
+    ">
+
+        <img
+            src="{{ asset('images/toothfairy2.jpg') }}"
+            style="
+                width:100%;
+                height:100%;
+                object-fit:cover;
+            "
+        >
+
+    </div>
+
+</div>
+<div style="margin-bottom:24px;">
+
+    <h2 style="
+        margin:0;
+        font-size:28px;
+        font-weight:700;
+        color:#0f172a;
+    ">
+        Welcome Admin
+    </h2>
+
+    <div style="
+        margin-top:8px;
+        display:flex;
+        flex-direction:column;
+        gap:2px;
+    ">
+
+        <div style="
+            font-size:13px;
+            color:#64748b;
+            font-weight:500;
+        ">
+            Today
+        </div>
+
+       <div id="live-clock" style="
+            font-size:16px;
+            font-weight:600;
+            color:#0f172a;
+        "></div>
+
+    </div>
+
+</div>
+
+<script>
+function updateClock() {
+
+    const now = new Date();
+
+    const datePart = now.toLocaleDateString('en-PH', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+
+    const timePart = now.toLocaleTimeString('en-PH', {
+        timeZone: 'Asia/Manila',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+
+    document.getElementById('live-clock').innerHTML = `
+        <div style="font-size:12px; font-weight:600; color:#0f172a;">
+            ${datePart}
+        </div>
+        <div style="font-size:16px; color:#008000; margin-top:2px;">
+            ${timePart}
+        </div>
+    `;
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+
+{{-- ===================================================== --}}
+{{-- CALCULATOR MODAL --}}
+{{-- ===================================================== --}}
+
+<div
+    id="calculator-modal"
+    style="
+        display:none;
+
+        position:fixed;
+        inset:0;
+
+        background:rgba(0,0,0,0.35);
+
+        justify-content:center;
+        align-items:center;
+
+        z-index:10000;
+    "
+>
+
+    <div style="
+        width:300px;
+
+        background:#f8fafc;
+
+        border-radius:16px;
+
+        padding:18px;
+
+        box-shadow:
+            0 12px 35px rgba(0,0,0,0.25);
+
+        position:relative;
+    ">
+
+        {{-- CLOSE --}}
+        <button
+            type="button"
+            id="close-calculator-btn"
+            style="
+                position:absolute;
+                top:10px;
+                right:10px;
+
+                border:none;
+                background:none;
+
+                font-size:20px;
+                cursor:pointer;
+            "
+        >
+            ✕
+        </button>
+
+        {{-- DISPLAY --}}
+        <input
+            type="text"
+            id="calc-display"
+            readonly
+
+            style="
+                width:100%;
+                height:55px;
+
+                margin-bottom:14px;
+
+                border:1px solid #cbd5e1;
+                border-radius:10px;
+
+                background:white;
+
+                text-align:right;
+
+                padding:10px;
+
+                font-size:24px;
+            "
+        >
+
+        {{-- BUTTONS --}}
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:8px;
+        ">
+
+            <button onclick="clearCalc()">C</button>
+            <button onclick="appendCalc('/')">÷</button>
+            <button onclick="appendCalc('*')">×</button>
+            <button onclick="deleteLast()">⌫</button>
+
+            <button onclick="appendCalc('7')">7</button>
+            <button onclick="appendCalc('8')">8</button>
+            <button onclick="appendCalc('9')">9</button>
+            <button onclick="appendCalc('-')">−</button>
+
+            <button onclick="appendCalc('4')">4</button>
+            <button onclick="appendCalc('5')">5</button>
+            <button onclick="appendCalc('6')">6</button>
+            <button onclick="appendCalc('+')">+</button>
+
+            <button onclick="appendCalc('1')">1</button>
+            <button onclick="appendCalc('2')">2</button>
+            <button onclick="appendCalc('3')">3</button>
+
+            <button
+                onclick="calculate()"
+                style="
+                    background:#3b82f6;
+                    color:white;
+                    font-weight:700;
+                "
+            >
+                =
+            </button>
+
+            <button
+                style="grid-column:span 2;"
+                onclick="appendCalc('0')"
+            >
+                0
+            </button>
+
+            <button onclick="appendCalc('.')">.</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+#calculator-modal button{
+
+    height:50px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:white;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+#calculator-modal button:hover{
+
+    background:#e2e8f0;
+}
+
+</style>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calcModal =
+        document.getElementById('calculator-modal');
+
+    const calcDisplay =
+        document.getElementById('calc-display');
+
+    const openBtn =
+        document.getElementById('open-calculator-btn');
+
+    const closeBtn =
+        document.getElementById('close-calculator-btn');
+
+    // SAFETY CHECK
+    if (!openBtn || !closeBtn) return;
+
+    openBtn.addEventListener('click', () => {
+
+        calcModal.style.display = 'flex';
+    });
+
+    closeBtn.addEventListener('click', () => {
+
+        calcModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(e){
+
+        if (e.target === calcModal) {
+
+            calcModal.style.display = 'none';
+        }
+    });
+
+    // =====================================================
+    // CALCULATOR FUNCTIONS
+    // =====================================================
+
+    window.appendCalc = function(value)
+    {
+        calcDisplay.value += value;
+    }
+
+    window.clearCalc = function()
+    {
+        calcDisplay.value = '';
+    }
+
+    window.deleteLast = function()
+    {
+        calcDisplay.value =
+            calcDisplay.value.slice(0, -1);
+    }
+
+    window.calculate = function()
+    {
+        try {
+
+            calcDisplay.value =
+                eval(calcDisplay.value);
+
+        } catch {
+
+            calcDisplay.value = 'Error';
+        }
+    }
+
+});
+
+</script>
+
 
 {{-- ===================================================== --}}
 {{-- TOP BAR --}}
 {{-- ===================================================== --}}
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-    <div>
-        <div style="font-size:13px; color:#64748b; margin-bottom:4px;">Today</div>
-        <div style="font-size:28px; font-weight:700; color:#0f172a;">
-            {{ now()->format('F d, Y') }}
-        </div>
-    </div>
 
-    <button class="btn"
-            onclick="openCalendar()"
-            style="display:flex;align-items:center;gap:8px;">
+
+
+
+
+
+
+{{-- PLACE THIS BUTTON ANYWHERE --}}
+<div style="
+    display:flex;
+    align-items:center;
+    gap:10px;
+">
+
+    {{-- CALCULATOR --}}
+    <button
+        type="button"
+        id="open-calculator-btn"
+        style="
+            padding:10px 14px;
+
+            border:none;
+            border-radius:10px;
+
+            background:#3b82f6;
+            color:white;
+
+            font-size:16px;
+            font-weight:600;
+
+            cursor:pointer;
+        "
+    >
+        🧮 Calculator
+    </button>
+
+    {{-- CALENDAR --}}
+    <button
+        class="btn"
+        onclick="openCalendar()"
+        style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+        "
+    >
         📅 Open Calendar
     </button>
+
+</div>
+
+
 
 </div>
 

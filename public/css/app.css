@@ -130,6 +130,21 @@ body {
     transition: all 0.25s ease;
 }
 
+.cardHeader {
+    background: #e6f3ff;
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.04),
+        0 8px 20px rgba(0,0,0,0.05);
+
+    transition: all 0.25s ease;
+}
+
+
+
 .card:hover {
     transform: translateY(-2px);
     box-shadow:
