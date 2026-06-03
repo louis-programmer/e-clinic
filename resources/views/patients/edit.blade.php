@@ -37,6 +37,9 @@
 <input class="form-input" name="contact_number" 
     value="{{ old('contact_number', $patient->contact_number) }}" placeholder="Contact Number">
 
+    <input class="form-input" name="email" 
+    value="{{ old('email', $patient->email) }}" placeholder="Email">
+
 <input class="form-input" name="address" 
     value="{{ old('address', $patient->address) }}" placeholder="Address">
         <button class="btn btn-primary">Update Patient</button>

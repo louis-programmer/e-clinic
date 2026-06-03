@@ -159,6 +159,16 @@
             </div>
 
 
+            <div>
+                <div style="font-size:12px;color:#64748b;">
+                    Email
+                </div>
+
+                <div style="font-weight:600;">
+                    {{ $patient->email ?? 'N/A' }}
+                </div>
+            </div>
+
 
 
 

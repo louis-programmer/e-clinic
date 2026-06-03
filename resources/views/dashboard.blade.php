@@ -400,9 +400,9 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 
-
+<!-- suspected remnant closing div
 </div>
-
+-->
 
 @if($birthdayPatients->count())
     <div class="card" style="

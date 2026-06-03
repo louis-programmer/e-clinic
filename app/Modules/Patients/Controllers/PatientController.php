@@ -53,7 +53,8 @@ class PatientController extends Controller
                         $q->where('first_name', 'like', "%{$search}%")
                             ->orWhere('last_name', 'like', "%{$search}%")
                             ->orWhere('middle_name', 'like', "%{$search}%")
-                            ->orWhere('contact_number', 'like', "%{$search}%");
+                            ->orWhere('contact_number', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%"); // ✅ ADD THIS
 
                     });
 
@@ -263,6 +264,12 @@ class PatientController extends Controller
                 'string',
                 'max:20',
             ],
+
+            'email' => [
+            'nullable',
+            'email',
+            'max:255',
+        ],
 
             'address' => [
                 $required,

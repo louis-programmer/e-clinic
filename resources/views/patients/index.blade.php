@@ -202,12 +202,25 @@
 
                         <div style="
                             color:#64748b;
-                            font-size:14px;
-                            margin-bottom:4px;
+                            font-size:13px;
+                            display:flex;
+                            flex-direction:column;
+                            gap:2px;
                         ">
-                            {{ $patient->contact_number }}
-                        </div>
 
+                            {{-- CONTACT NUMBER --}}
+                            <div>
+                                📞 {{ $patient->contact_number ?? 'N/A' }}
+                            </div>
+
+                            {{-- EMAIL --}}
+                            @if($patient->email)
+                                <div>
+                                    ✉️ {{ $patient->email }}
+                                </div>
+                            @endif
+
+                        </div>
 
 
 

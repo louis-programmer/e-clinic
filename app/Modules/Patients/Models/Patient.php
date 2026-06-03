@@ -23,6 +23,7 @@ class Patient extends Model
         'birthdate',
         'gender',
         'contact_number',
+        'email',
         'address',
     ];
 

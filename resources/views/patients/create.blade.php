@@ -27,6 +27,18 @@
             </select>
        
         <input class="form-input" name="contact_number" placeholder="Contact Number">
+
+        
+
+            <input class="form-input"
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+                class="form-control"
+                placeholder="Email"
+            >
+
+
         <input class="form-input" name="address" placeholder="Address">
         <input class="form-input" type="date" name="birthdate" placeholder="Birthdate">
 
