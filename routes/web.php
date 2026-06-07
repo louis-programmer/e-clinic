@@ -20,6 +20,10 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 
 use App\Modules\Patients\Controllers\DentalChartController;
+
+use App\Http\Controllers\ClinicProfileController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Guest Routes
@@ -206,7 +210,11 @@ Route::middleware('auth')->group(function () {
 
 
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Invoice
+    |--------------------------------------------------------------------------
+    */
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
     ->name('invoices.show');
 
@@ -226,4 +234,25 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [ScanController::class, 'store'])
             ->name('scan.store');
     });
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clinic Profile
+    |--------------------------------------------------------------------------
+    */
+        Route::get(
+            '/clinic-profile',
+            [ClinicProfileController::class, 'edit']
+        );
+
+        Route::post(
+            '/clinic-profile',
+            [ClinicProfileController::class, 'update']
+        );
+
+
+
 });

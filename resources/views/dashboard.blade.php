@@ -440,33 +440,198 @@ document.addEventListener('DOMContentLoaded', function () {
 {{-- ===================================================== --}}
 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
 
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
+
+    {{-- TOTAL PATIENTS --}}
     <a href="/patients" style="text-decoration:none; color:inherit;">
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">Total Patients</div>
-                    <div style="font-size:34px; font-weight:700;">0</div>
+                    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                        Total Patients
+                    </div>
+
+                    <div style="font-size:34px; font-weight:700;">
+                        {{ number_format($totalPatients) }}
+                    </div>
                 </div>
-                <div style="font-size:42px;">👥</div>
+
+                <div style="font-size:42px;">
+                    👥
+                </div>
             </div>
         </div>
     </a>
 
+    {{-- NEW THIS MONTH --}}
     <div class="card">
+
         <div style="display:flex; justify-content:space-between; align-items:center;">
+
             <div>
-                <div style="font-size:13px; color:#64748b; margin-bottom:8px;">New Patients</div>
-                <div style="font-size:34px; font-weight:700;">0</div>
+                <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                    New Patients This Month
+                </div>
+
+                <div style="font-size:34px; font-weight:700;">
+                    {{ number_format($newPatientsThisMonth) }}
+                </div>
             </div>
-            <div style="font-size:42px;">✨</div>
+
+            <div style="font-size:42px;">
+                ✨
+            </div>
+
         </div>
+
+    </div>
+
+    {{-- LAST 6 MONTHS --}}
+    <div class="card">
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+
+            <div>
+                <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                    New Patients (6 Months)
+                </div>
+
+                <div style="font-size:34px; font-weight:700;">
+                    {{ number_format($newPatientsLastSixMonths) }}
+                </div>
+            </div>
+
+            <div style="font-size:42px;">
+                📈
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
 
 
+{{-- ===================================================== --}}
+{{-- FINANCIAL OVERVIEW --}}
+{{-- ===================================================== --}}
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
 
+    {{-- TODAY REVENUE --}}
+    <div class="card">
+        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+            Today's Revenue
+        </div>
+
+        <div style="font-size:34px; font-weight:700;">
+            ₱{{ number_format($todayRevenue, 2) }}
+        </div>
+    </div>
+
+    {{-- OUTSTANDING BALANCE --}}
+    <div class="card">
+        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+            Total Outstanding Balance
+        </div>
+
+        <div style="font-size:34px; font-weight:700; color:#dc2626;">
+            ₱{{ number_format($totalOutstandingBalance, 2) }}
+        </div>
+    </div>
+
+    {{-- UNPAID INVOICES --}}
+    <div class="card">
+        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+            Unpaid Invoices
+        </div>
+
+        <div style="font-size:34px; font-weight:700;">
+            {{ number_format($unpaidInvoices) }}
+        </div>
+    </div>
+
+    {{-- PATIENTS SEEN TODAY --}}
+    <div class="card">
+        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+            Patients Seen Today
+        </div>
+
+        <div style="font-size:34px; font-weight:700;">
+            {{ number_format($patientsSeenToday) }}
+        </div>
+    </div>
+
+</div>
+
+
+<div class="card" style="margin-top:20px;">
+
+    <h3>💰 Revenue (Last 6 Months)</h3>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
+
+        @foreach($monthlyRevenueLast6Months as $month)
+            <div style="
+                padding:12px;
+                border:1px solid #e2e8f0;
+                border-radius:10px;
+                text-align:center;
+            ">
+                <div style="font-size:13px; color:#64748b;">
+                    {{ $month->month }}
+                </div>
+
+                <div style="font-size:18px; font-weight:700;">
+                    ₱{{ number_format($month->total, 2) }}
+                </div>
+            </div>
+        @endforeach
+
+    </div>
+
+</div>
+
+
+<div class="card" style="margin-top:20px;">
+
+    <h3>🏆 Top Treatments (By Revenue)</h3>
+
+    <table style="width:100%; border-collapse:collapse;">
+
+        <thead>
+            <tr>
+                <th style="text-align:left;">Treatment</th>
+                <th>Times Used</th>
+                <th style="text-align:right;">Revenue</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach($topTreatments as $treatment)
+                <tr style="border-top:1px solid #e2e8f0;">
+                    
+                    <td style="padding:10px;">
+                        {{ $treatment->procedure->name ?? $treatment->description ?? 'Unknown' }}
+                    </td>
+
+                    <td style="text-align:center;">
+                        {{ $treatment->count }}
+                    </td>
+
+                    <td style="text-align:right; font-weight:700;">
+                        ₱{{ number_format($treatment->revenue, 2) }}
+                    </td>
+
+                </tr>
+            @endforeach
+
+        </tbody>
+
+    </table>
+
+</div>
 
 {{-- ===================================================== --}}
 {{-- FUTURE MIDDLE SECTION (placeholder for expansion) --}}

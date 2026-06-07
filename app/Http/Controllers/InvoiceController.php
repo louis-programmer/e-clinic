@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
-
+use App\Models\ClinicProfile;
 class InvoiceController extends Controller
 {
     public function __construct()
@@ -20,6 +20,11 @@ class InvoiceController extends Controller
             'payments',
         ]);
 
-        return view('invoices.show', compact('invoice'));
+        $clinic = ClinicProfile::first();
+
+       return view('invoices.show', compact(
+                'invoice',
+                'clinic'
+            ));
     }
 }

@@ -104,5 +104,22 @@ class Patient extends Model
         }
 
 
-             
+
+
+            public function lastVisitDate()
+            {
+                $lastEncounter = $this->encounters
+                    ->sortByDesc('encounter_date')
+                    ->first()?->encounter_date;
+
+                $lastInvoice = $this->invoices
+                    ->sortByDesc('created_at')
+                    ->first()?->created_at;
+
+                return collect([$lastEncounter, $lastInvoice])
+                    ->filter()
+                    ->sortDesc()
+                    ->first();
+            }
+
 }

@@ -36,10 +36,12 @@
 
 @endif
 
-<div style="
+<div class="invoice-print" style="
     max-width:1100px;
     margin:auto;
 ">
+
+<div id="invoice-print-area">
 
     {{-- ===================================================== --}}
     {{-- PAGE HEADER --}}
@@ -54,7 +56,43 @@
             gap:10px;
         ">
 
-            <div>
+                        <button onclick="window.print()" class="btn btn-secondary">
+                                🖨 Print Invoice
+                            </button>
+
+                            <div>
+
+                                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:20px;
+                    border-bottom:1px solid #e2e8f0;
+                    padding-bottom:15px;
+                ">
+
+                    <div style="display:flex; gap:15px; align-items:center;">
+
+                        @if($clinic->logo_path)
+                            <img src="{{ asset('storage/' . $clinic->logo_path) }}"
+                                 style="width:60px; height:60px; object-fit:contain;">
+                        @endif
+
+                        <div>
+                            <div style="font-size:18px; font-weight:700;">
+                                {{ $clinic->clinic_name }}
+                            </div>
+
+                            <div style="font-size:12px; color:#64748b;">
+                                {{ $clinic->address }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
 
                 <h2 style="margin:0;">
                     Invoice Details
@@ -112,8 +150,21 @@
                     Invoice Status
                 </div>
 
+
+
                 <div style="font-weight:600;">
                     {{ ucfirst($invoice->status) }}
+                </div>
+            </div>
+
+
+            <div>
+                <div style="font-size:13px; color:#64748b;">
+                    Invoice Date
+                </div>
+
+                <div style="font-weight:600;">
+                    {{ $invoice->created_at->format('M d, Y h:i A') }}
                 </div>
             </div>
 
@@ -190,6 +241,8 @@
 
     </div>
 
+</div> {{-- end invoice-print-area --}}
+
 
 
 
@@ -197,98 +250,7 @@
     {{-- ===================================================== --}}
     {{-- INVOICE ITEMS --}}
     {{-- ===================================================== --}}
-    <div class="card" style="margin-bottom:20px;">
-
-        <h3 style="margin-top:0;">
-            Procedures
-        </h3>
-
-        <div style="
-            overflow-x:auto;
-        ">
-
-            <table style="
-                width:100%;
-                border-collapse:collapse;
-            ">
-
-                <thead>
-
-                    <tr style="
-                        background:#f8fafc;
-                    ">
-
-                        <th style="
-                            text-align:left;
-                            padding:12px;
-                        ">
-                            Procedure
-                        </th>
-
-                        <th style="
-                            text-align:left;
-                            padding:12px;
-                        ">
-                            Qty
-                        </th>
-
-                        <th style="
-                            text-align:left;
-                            padding:12px;
-                        ">
-                            Unit Price
-                        </th>
-
-                        <th style="
-                            text-align:left;
-                            padding:12px;
-                        ">
-                            Line Total
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @foreach($invoice->items as $item)
-
-                        <tr style="
-                            border-top:1px solid #e2e8f0;
-                        ">
-
-                            <td style="padding:12px;">
-                                {{ $item->description }}
-                            </td>
-
-                            <td style="padding:12px;">
-                                {{ $item->qty }}
-                            </td>
-
-                            <td style="padding:12px;">
-                                ₱{{ number_format($item->unit_price, 2) }}
-                            </td>
-
-                            <td style="
-                                padding:12px;
-                                font-weight:600;
-                            ">
-                                ₱{{ number_format($item->line_total, 2) }}
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
+ 
 
 
 
@@ -302,8 +264,80 @@
             Payments
         </h3>
 
-        <form method="POST" action="{{ route('payments.store', $invoice) }}">
+
+            <div style="margin-top:30px; border-top:1px solid #e2e8f0; padding-top:20px;">
+
+                <h3>Payment Instructions</h3>
+
+                {{-- CASH --}}
+                @if(in_array('cash', $clinic->enabled_payment_methods ?? []))
+                    <p><strong>Cash:</strong> Pay directly at the clinic.</p>
+                @endif
+
+                {{-- GCASH --}}
+                @if(in_array('gcash', $clinic->enabled_payment_methods ?? []))
+                    <div style="margin-bottom:15px;">
+                        <strong>GCash Payment</strong><br>
+
+                        @if($clinic->gcash_qr_path)
+                            <img src="{{ asset('storage/' . $clinic->gcash_qr_path) }}"
+                                 style="width:160px; margin-top:10px;">
+                        @endif
+                    </div>
+                @endif
+
+                {{-- MAYA --}}
+                @if(in_array('maya', $clinic->enabled_payment_methods ?? []))
+                    <div style="margin-bottom:15px;">
+                        <strong>Maya Payment</strong><br>
+
+                        @if($clinic->maya_qr_path)
+                            <img src="{{ asset('storage/' . $clinic->maya_qr_path) }}"
+                                 style="width:160px; margin-top:10px;">
+                        @endif
+                    </div>
+                @endif
+
+                {{-- BANK --}}
+                @if(in_array('bank', $clinic->enabled_payment_methods ?? []))
+                    <div>
+                        <strong>Bank Transfer</strong><br>
+                        {{ $clinic->bank_name }}<br>
+                        {{ $clinic->bank_account_name }}<br>
+                        {{ $clinic->bank_account_number }}
+                    </div>
+                @endif
+
+            </div>
+
+
+
+<form method="POST" action="{{ route('payments.store', $invoice) }}">
     @csrf
+
+
+
+    <div style="margin-bottom:10px;">
+    <label style="font-weight:600;">Payment Method</label>
+
+    <select name="method" class="form-input" required>
+        <option value="cash">Cash</option>
+
+        @if(in_array('gcash', $clinic->enabled_payment_methods ?? []))
+            <option value="gcash">GCash</option>
+        @endif
+
+        @if(in_array('maya', $clinic->enabled_payment_methods ?? []))
+            <option value="maya">Maya</option>
+        @endif
+
+        @if(in_array('bank', $clinic->enabled_payment_methods ?? []))
+            <option value="bank">Bank Transfer</option>
+        @endif
+    </select>
+</div>
+
+
 
     <div style="margin-bottom:10px;">
         <label style="font-weight:600;">Payment Amount</label>
@@ -315,16 +349,7 @@
                required>
     </div>
 
-    <div style="margin-bottom:10px;">
-        <label style="font-weight:600;">Payment Method</label>
-        <select name="method" class="form-input" required>
-            <option value="">-- Select Payment Method --</option>
-            <option value="cash">Cash</option>
-            <option value="gcash">GCash</option>
-            <option value="card">Card</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="cheque">Cheque</option>
-</select>
+  
     </div>
 
     <div style="margin-bottom:10px;">
@@ -342,5 +367,38 @@
     </div>
 
 </div>
+<style>
+@media print {
+
+    body * {
+        visibility: hidden;
+    }
+
+    #invoice-print-area,
+    #invoice-print-area * {
+        visibility: visible;
+    }
+
+    #invoice-print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    .btn,
+    form,
+    nav,
+    header,
+    aside {
+        display: none !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+</style>
 
 @endsection

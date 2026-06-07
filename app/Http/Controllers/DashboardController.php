@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Modules\Patients\Models\Appointment;
 use App\Modules\Patients\Models\Patient;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -13,6 +14,37 @@ class DashboardController extends Controller
     {
 
 $clinicId = auth()->user()->clinic_id;
+
+/*
+|--------------------------------------------------------------------------
+| Patient Statistics
+|--------------------------------------------------------------------------
+*/
+
+$totalPatients = Patient::where(
+    'clinic_id',
+    $clinicId
+)->count();
+
+$newPatientsThisMonth = Patient::where(
+    'clinic_id',
+    $clinicId
+)
+->whereYear('created_at', now()->year)
+->whereMonth('created_at', now()->month)
+->count();
+
+$newPatientsLastSixMonths = Patient::where(
+    'clinic_id',
+    $clinicId
+)
+->where(
+    'created_at',
+    '>=',
+    now()->subMonths(6)
+)
+->count();
+
                 /*
         |--------------------------------------------------------------------------
         | Today Birthday
@@ -32,15 +64,13 @@ $clinicId = auth()->user()->clinic_id;
         | Today Appointments
         |--------------------------------------------------------------------------
         */
-$todayAppointments = Appointment::with(['patient' => function ($q) use ($clinicId) {
-        $q->where('clinic_id', $clinicId);
-    }])
-    ->whereHas('patient', function ($q) use ($clinicId) {
-        $q->where('clinic_id', $clinicId);
-    })
-    ->today()
-    ->orderBy('appointment_date')
-    ->get();
+            $todayAppointments = Appointment::with('patient')
+                ->whereHas('patient', function ($q) use ($clinicId) {
+                    $q->where('clinic_id', $clinicId);
+                })
+                ->today()
+                ->orderBy('appointment_date')
+                ->get();
         $scheduledCount = $todayAppointments->count();
 
         /*
@@ -71,10 +101,113 @@ $todayAppointments = Appointment::with(['patient' => function ($q) use ($clinicI
         |--------------------------------------------------------------------------
         */
         $appointments = $appointmentsRaw->groupBy(function ($item) {
-            return optional($item->appointment_date)
+            return $item->appointment_date
                 ? $item->appointment_date->format('Y-m-d')
                 : null;
         });
+
+
+
+     /*
+                |--------------------------------------------------------------------------
+                | FINANCIAL METRICS
+                |--------------------------------------------------------------------------
+                */
+
+                $todayRevenue = \App\Models\Payment::whereDate('created_at', today())
+                    ->whereHas('invoice.patient', function ($q) use ($clinicId) {
+                        $q->where('clinic_id', $clinicId);
+                    })
+                    ->sum('amount');
+
+                $unpaidInvoices = \App\Models\Invoice::whereHas('patient', function ($q) use ($clinicId) {
+                        $q->where('clinic_id', $clinicId);
+                    })
+                    ->where('status', '!=', 'paid')
+                    ->count();
+   
+
+                $totalOutstandingBalance = \App\Models\Invoice::whereHas('patient', function ($q) use ($clinicId) {
+                        $q->where('clinic_id', $clinicId);
+                    })
+                    ->sum('balance');
+
+
+                        
+                /*
+                |--------------------------------------------------------------------------
+                | FINANCE - LAST 6 MONTHS
+                |--------------------------------------------------------------------------
+                */
+
+                $monthlyRevenueLast6Months = \App\Models\Payment::select(
+                        DB::raw("SUM(amount) as total"),
+                        DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month")
+                    )
+                    ->whereDate('created_at', '>=', Carbon::now()->subMonths(6))
+                    ->whereHas('invoice.patient', function ($q) use ($clinicId) {
+                        $q->where('clinic_id', $clinicId);
+                    })
+                    ->groupBy('month')
+                    ->orderBy('month')
+                    ->get();
+
+
+
+                        /*
+                |--------------------------------------------------------------------------
+                | CLINICAL METRICS
+                |--------------------------------------------------------------------------
+                */
+
+                $patientsSeenToday = \App\Modules\Patients\Models\Appointment::whereHas(
+                    'patient',
+                    function ($q) use ($clinicId) {
+                        $q->where('clinic_id', $clinicId);
+                    }
+                )
+                ->whereDate('appointment_date', today())
+                ->where('status', 'completed')
+                ->count();
+
+
+
+
+
+
+                        /*
+                |--------------------------------------------------------------------------
+                | top treatments
+                |--------------------------------------------------------------------------
+                */
+/*
+                    $topTreatments = \App\Models\InvoiceItem::select(
+                        'procedure_id',
+                        DB::raw('SUM(line_total) as revenue'),
+                        DB::raw('COUNT(*) as count')
+                    )
+                    ->with('procedure')
+                    ->whereHas('invoice.patient', function ($q) use ($clinicId) {
+                        $q->where('clinic_id', $clinicId);
+                    })
+                    ->groupBy('procedure_id')
+                    ->orderByDesc('revenue')
+                    ->limit(5)
+                    ->get();
+
+*/
+                        $topTreatments = \App\Models\InvoiceItem::select(
+                            'procedure_id',
+                            DB::raw('SUM(line_total) as revenue'),
+                            DB::raw('COUNT(*) as count')
+                        )
+                        ->whereHas('invoice.patient', function ($q) use ($clinicId) {
+                            $q->where('clinic_id', $clinicId);
+                        })
+                        ->groupBy('procedure_id')
+                        ->orderByDesc('revenue')
+                        ->limit(5)
+                        ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -89,7 +222,22 @@ $todayAppointments = Appointment::with(['patient' => function ($q) use ($clinicI
                 'appointments',
                 'daysInMonth',
                 'startOfMonth',
-                'birthdayPatients'
+                'birthdayPatients',
+                 'totalPatients',
+                'newPatientsThisMonth',
+                'newPatientsLastSixMonths',
+                'todayRevenue',
+                'unpaidInvoices',
+                'totalOutstandingBalance',
+                'patientsSeenToday',
+                'monthlyRevenueLast6Months',
+                'topTreatments'
+
             ));
+
+
+
+           
+
     }
 }

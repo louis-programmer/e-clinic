@@ -234,10 +234,14 @@
                         ">
 
                             {{-- LAST VISIT --}}
-                            <div>
-                                <strong>Last Visit:</strong>
-                                —
-                            </div>
+                            @php
+                                $lastVisit = $patient->lastVisitDate();
+                            @endphp
+
+                            <strong>Last Visit:</strong>
+                            <span style="color:#0f172a;">
+                                {{ $lastVisit ? $lastVisit->format('M d, Y') : 'No visit yet' }}
+                            </span>
 
                             {{-- BALANCE --}}
                            <div>

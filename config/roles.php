@@ -10,6 +10,16 @@ return [
     'overview_history' => ['admin', 'staff', 'doctor'], // Progress/Patient notes
     'patient_photos' => ['admin', 'staff', 'doctor'], // Photos
     
+    /// Invoice and payment
+   
+   /* 
+    'invoice_view' => ['admin', 'staff', 'doctor'],
+	'invoice_create' => ['admin', 'staff'],
+	'invoice_update' => ['admin'],
+	'invoice_delete' => ['admin'],
+    
+    */
+    
 	/// Currently "Progress Notes " 
     'encounter_view' => ['admin', 'staff', 'doctor'],
     'encounter_manage' => ['admin', 'staff'],

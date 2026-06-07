@@ -45,6 +45,10 @@ class PatientController extends Controller
             $search = trim($request->get('search'));
 
             $patients = Patient::query()
+                    ->with([
+                        'encounters:id,patient_id,encounter_date',
+                        'invoices:id,patient_id,created_at',
+                    ])
 
                 ->when($search, function ($query) use ($search) {
 
