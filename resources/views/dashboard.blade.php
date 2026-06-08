@@ -1,3 +1,20 @@
+{{--dev notes
+
+### Documented
+
+### uses:
+    -DashboardController.php
+    -Invoice.php
+    -InvoiceController.php
+    -Payment.php
+    -PaymemntController.php
+    -add.blade.php
+    
+
+
+--}}
+
+
 @extends('layouts.app')
 
 @section('content')

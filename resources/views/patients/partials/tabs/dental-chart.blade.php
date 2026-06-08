@@ -1,3 +1,19 @@
+{{-- 
+Tab for Dental chart
+
+    Connected to:
+        -DentalChartRecord.php
+        -DentalChartController.php
+        -PatientTooth.php
+        -tooth.blade.php
+
+
+        -- has own CSS
+
+        -- chart color is within this code
+--}}
+
+
 {{-- ===================================================== --}}
 {{-- DENTAL CHART (SURFACE-BASED ODONTOGRAM) --}}
 {{-- ===================================================== --}}
@@ -6,47 +22,53 @@
 
     <h3 style="margin-bottom:15px;">Dental Chart</h3>
 
-    {{-- SELECTED --}}
-    <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-bottom:15px;">
-        <strong>Selected:</strong>
-        <div id="selected-tooth" style="color:#2563eb;font-weight:600;">
-            None
-        </div>
-    </div>
 
-    {{-- NOTES --}}
-    <div style="margin-bottom:20px;">
-
-        <label style="font-weight:600;display:block;margin-bottom:6px;">
-            Surface Remarks
-        </label>
-
-        <div style="margin-bottom:10px;">
-            <label style="font-weight:600;">Condition</label>
-
-            <select id="condition-select" class="form-input">
-                <option value="">None</option>
-                <option value="healthy">Healthy</option>
-                <option value="decay">Decay</option>
-                <option value="filling">Filling</option>
-                <option value="crown">Crown</option>
-                <option value="missing">Missing</option>
-                <option value="extraction">Extraction</option>
-                <option value="sealant">Sealant</option>
-            </select>
+        <div id="tooth-editor-backdrop"
+             style="
+                display:none;
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.35);
+                z-index:99998;
+             ">
         </div>
 
-        <textarea id="tooth-note"
-                  class="form-input"
-                  rows="4"
-                  disabled
-                  placeholder="Select a surface first..."></textarea>
+            <div id="tooth-editor" class="tooth-editor">
 
-        <button id="save-note" class="btn btn-primary" disabled style="margin-top:10px;">
-            Save Note
-        </button>
+                <div style="font-weight:600;margin-bottom:8px;">
+                    <span id="editor-title"></span>
+                </div>
 
-    </div>
+                <select id="condition-select" class="form-input">
+                    <option value="">None</option>
+                    <option value="healthy">Healthy</option>
+                    <option value="decay">Decay</option>
+                    <option value="filling">Filling</option>
+                    <option value="crown">Crown</option>
+                    <option value="missing">Missing</option>
+                    <option value="extraction">Extraction</option>
+                    <option value="sealant">Sealant</option>
+                </select>
+
+                <textarea
+                    id="tooth-note"
+                    class="form-input"
+                    rows="3"
+                    placeholder="Remarks..."
+                    style="margin-top:10px;"
+                ></textarea>
+
+                <button
+                    id="save-note"
+                    class="btn btn-primary"
+                    style="margin-top:10px;"
+                >
+                    Save
+                </button>
+
+            </div>
+
+
 
     {{-- TOOTH GRID --}}
     @php
@@ -167,18 +189,56 @@
 .surface.extraction { background:#111827; }
 .surface.sealant { background:#10b981; }
 .surface.healthy { background:#22c55e; }
+
+.tooth-editor {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 320px;
+
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 15px;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+
+    display: none;
+    z-index: 99999;
+}
+
 </style>
 
 {{-- ===================================================== --}}
 {{-- SCRIPT --}}
 {{-- ===================================================== --}}
 <script>
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
-    const dentalRecords = @json($records);
-    const toothStates = @json($toothStates);
+        const editor = document.getElementById('tooth-editor');
+    const editorTitle = document.getElementById('editor-title');
+    const backdrop =document.getElementById('tooth-editor-backdrop');
 
-    const display = document.getElementById('selected-tooth');
+
+
+
+    const dentalRecords = @json($records);
+
+
+
+            if (backdrop && editor) {
+                backdrop.addEventListener('click', function () {
+                    editor.style.display = 'none';
+                    backdrop.style.display = 'none';
+                });
+            }
+
     const noteBox = document.getElementById('tooth-note');
     const saveBtn = document.getElementById('save-note');
     const conditionSelect = document.getElementById('condition-select');
@@ -209,21 +269,19 @@ function applyInitialState() {
     });
 }
 
-window.requestAnimationFrame(() => {
-    applyInitialState();
-});
-
+   applyInitialState();
     // =====================================
     // CLICK HANDLER
     // =====================================
-    document.addEventListener('click', function (e) {
+    document.querySelector('.card').addEventListener('click', function(e) {
 
         const surface = e.target.closest('.surface');
         if (!surface) return;
 
-        document.querySelectorAll('.surface').forEach(s =>
-            s.classList.remove('active')
-        );
+            const surfaces = document.querySelectorAll('.surface');
+            surfaces.forEach(s =>
+                s.classList.remove('active')
+            );
 
         surface.classList.add('active');
 
@@ -231,15 +289,19 @@ window.requestAnimationFrame(() => {
         activeTooth = surface.dataset.tooth;
         activeSide = surface.dataset.side;
 
-        display.innerText = `Tooth ${activeTooth} - ${activeSide}`;
+            const rect = surface.getBoundingClientRect();
+
+
+             backdrop.style.display = 'block';
+            editor.style.display = 'block';
+
+        editorTitle.innerText =`Tooth ${activeTooth} - ${activeSide}`;
 
         const existing = dentalRecords.find(r =>
             r.tooth_number == activeTooth &&
             r.surface == activeSide
         );
 
-        noteBox.disabled = false;
-        saveBtn.disabled = false;
 
         noteBox.value = existing ? existing.remarks : '';
        conditionSelect.value = existing?.condition || ''; // ✅ HERE
@@ -261,10 +323,18 @@ window.requestAnimationFrame(() => {
         formData.append('condition', conditionSelect.value);
         formData.append('_token', '{{ csrf_token() }}');
 
-        const res = await fetch("{{ route('dental-chart.store', $patient->id) }}", {
-            method: "POST",
-            body: formData
-        });
+            const res = await fetch("{{ route('dental-chart.store', $patient->id) }}", {
+                method: "POST",
+                body: formData
+            });
+
+            const text = await res.text();
+            console.log("SERVER RESPONSE:", text);
+
+            if (!res.ok) {
+                alert("Save failed");
+                return;
+            }
 
         if (res.ok) {
 
@@ -283,6 +353,10 @@ window.requestAnimationFrame(() => {
                 r.surface == activeSide
             );
 
+
+                editor.style.display = 'none';
+                backdrop.style.display = 'none';
+
            if (existing) {
 
                 existing.condition = conditionSelect.value;
@@ -300,7 +374,26 @@ window.requestAnimationFrame(() => {
 
             alert("Saved!");
         }
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.surface') && !e.target.closest('#tooth-editor')) {
+                editor.style.display = 'none';
+                backdrop.style.display = 'none';
+            }
+        });
+
+
+
     });
 
+
+
+
+
+
 });
+
+
+
+
 </script>

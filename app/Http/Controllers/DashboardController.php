@@ -1,5 +1,18 @@
 <?php
+/*
+### Documented
 
+### uses:
+    -DashboardController.php
+    -Invoice.php
+    -InvoiceController.php
+    -Payment.php
+    -PaymemntController.php
+    -add.blade.php
+    
+
+
+*/
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
