@@ -11,9 +11,63 @@ Tab for Dental chart
         -- has own CSS
 
         -- chart color is within this code
+
+    -- updated to use config file (/config)
+    when searching for the olf code, find "old"
+    below them are the new code for the config file
 --}}
 
+{{-- ===================================================== --}}
+{{-- DENTAL CHART LEGEND --}}
+{{-- ===================================================== --}}
+<div class="card" style="margin-bottom:20px;">
 
+    <h4 style="margin-top:0;margin-bottom:15px;">
+        Tooth Condition Legend
+    </h4>
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+        gap:10px;
+    ">
+
+        @foreach(config('dental-chart.conditions') as $condition => $color)
+
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                padding:8px 10px;
+                border:1px solid #e2e8f0;
+                border-radius:8px;
+                background:#fff;
+            ">
+
+                <div style="
+                    width:18px;
+                    height:18px;
+                    border-radius:4px;
+                    border:1px solid #cbd5e1;
+                    background:{{ $color }};
+                    flex-shrink:0;
+                ">
+                </div>
+
+                <span style="
+                    font-size:14px;
+                    color:#0f172a;
+                ">
+                    {{ $condition }}
+                </span>
+
+            </div>
+
+        @endforeach
+
+    </div>
+
+</div>
 {{-- ===================================================== --}}
 {{-- DENTAL CHART (SURFACE-BASED ODONTOGRAM) --}}
 {{-- ===================================================== --}}
@@ -41,13 +95,13 @@ Tab for Dental chart
 
                 <select id="condition-select" class="form-input">
                     <option value="">None</option>
-                    <option value="healthy">Healthy</option>
-                    <option value="decay">Decay</option>
-                    <option value="filling">Filling</option>
-                    <option value="crown">Crown</option>
-                    <option value="missing">Missing</option>
-                    <option value="extraction">Extraction</option>
-                    <option value="sealant">Sealant</option>
+                       @foreach(config('dental-chart.conditions') as    $condition => $color)
+
+                            <option value="{{ $condition }}">
+                                {{ $condition }}
+                            </option>
+
+                        @endforeach
                 </select>
 
                 <textarea
@@ -216,6 +270,15 @@ Tab for Dental chart
 {{-- ===================================================== --}}
 {{-- SCRIPT --}}
 {{-- ===================================================== --}}
+
+
+<script>
+// send config to js
+const dentalConditions = @json(
+    config('dental-chart.conditions')
+);
+
+</script>
 <script>
 
 
@@ -265,7 +328,14 @@ function applyInitialState() {
             return;
         }
 
-        surface.classList.add(record.condition);
+        // old
+       // surface.classList.add(record.condition);
+        if (record.condition && dentalConditions[record.condition]) {
+
+        surface.style.backgroundColor =  dentalConditions[record.condition];
+
+        }
+
     });
 }
 
@@ -337,7 +407,7 @@ function applyInitialState() {
             }
 
         if (res.ok) {
-
+            /* // old ver
             activeSurfaceElement.classList.remove(
                 'healthy','decay','filling','crown',
                 'missing','extraction','sealant'
@@ -345,6 +415,18 @@ function applyInitialState() {
 
             if (conditionSelect.value) {
                 activeSurfaceElement.classList.add(conditionSelect.value);
+            }
+
+            */
+
+            activeSurfaceElement.style.backgroundColor = '';
+
+            if (
+                conditionSelect.value &&
+                dentalConditions[conditionSelect.value]
+            ) {
+                activeSurfaceElement.style.backgroundColor =
+                    dentalConditions[conditionSelect.value];
             }
 
             // update local cache (IMPORTANT FIX)
