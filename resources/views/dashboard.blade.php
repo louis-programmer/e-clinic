@@ -612,9 +612,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <div class="card" style="margin-top:20px;">
 
-    <h3>🏆 Top Treatments (By Revenue)</h3>
+   <h3>🏆 Top Treatments (By Revenue)</h3>
 
-    <table style="width:100%; border-collapse:collapse;">
+        <div style="
+            overflow-x:auto;
+            width:100%;
+        ">
+
+            <table style="
+                width:100%;
+                min-width:500px;
+                border-collapse:collapse;
+            ">
 
         <thead>
             <tr>
@@ -647,6 +656,10 @@ document.addEventListener('DOMContentLoaded', function () {
         </tbody>
 
     </table>
+
+    </table>
+
+</div>
 
 </div>
 

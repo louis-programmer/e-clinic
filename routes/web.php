@@ -221,6 +221,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/invoices/{invoice}/payments', [PaymentController::class, 'store'])
     ->name('payments.store');
 
+
+    Route::post(
+            '/invoices/{invoice}/void',
+            [InvoiceController::class, 'void']
+        )->name('invoices.void');
+
     /*
     |--------------------------------------------------------------------------
     | Scan

@@ -94,8 +94,9 @@ class Patient extends Model
 
         public function getTotalBalanceAttribute()
         {
-            return $this->invoices()
-                ->sum('balance');
+                return $this->invoices()
+                    ->where('is_void', false)
+                    ->sum('balance');
         }
 
         public function dentalChartRecords()

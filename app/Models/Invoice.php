@@ -27,6 +27,11 @@ protected $fillable = [
     'remarks',
     'signature_path',
     'created_by',
+    'is_void',
+'voided_at',
+'voided_by',
+'void_reason',
+
 ];
 
     public function items()
@@ -46,8 +51,52 @@ protected $fillable = [
             return $this->belongsTo(Patient::class);
         }
 
+        protected $casts = [
+            'is_void' => 'boolean',
+            'voided_at' => 'datetime',
+        ];
 
-    
+            
 
+
+        public function canBeEdited()
+        {
+            return $this->payments()->count() === 0
+                && !$this->is_void;
+        }
+
+        public function canBeVoided()
+        {
+            return !$this->is_void;
+        }
+
+
+        public function scopeActive($query)
+        {
+            return $query->where('is_void', false);
+        }
+
+/*
+
+6. Future Improvement
+
+Add this to Invoice.php:
+
+public function scopeActive($query)
+{
+    return $query->where('is_void', false);
+}
+
+Then later you can write:
+
+Invoice::active()
+
+instead of:
+
+Invoice::where('is_void', false)
+
+throughout the project.
+*/
 
 }
+

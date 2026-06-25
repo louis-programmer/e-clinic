@@ -134,15 +134,17 @@ $newPatientsLastSixMonths = Patient::where(
                     ->sum('amount');
 
                 $unpaidInvoices = \App\Models\Invoice::whereHas('patient', function ($q) use ($clinicId) {
-                        $q->where('clinic_id', $clinicId);
-                    })
-                    ->where('status', '!=', 'paid')
-                    ->count();
+                            $q->where('clinic_id', $clinicId);
+                        })
+                        ->where('is_void', false)
+                        ->where('status', '!=', 'paid')
+                        ->count();
    
 
                 $totalOutstandingBalance = \App\Models\Invoice::whereHas('patient', function ($q) use ($clinicId) {
                         $q->where('clinic_id', $clinicId);
                     })
+                    ->where('is_void', false)
                     ->sum('balance');
 
 
@@ -209,11 +211,14 @@ $newPatientsLastSixMonths = Patient::where(
                     ->get();
 
 */
-                        $topTreatments = \App\Models\InvoiceItem::select(
+                       $topTreatments = \App\Models\InvoiceItem::select(
                             'procedure_id',
                             DB::raw('SUM(line_total) as revenue'),
                             DB::raw('COUNT(*) as count')
                         )
+                        ->whereHas('invoice', function ($q) {
+                            $q->where('is_void', false);
+                        })
                         ->whereHas('invoice.patient', function ($q) use ($clinicId) {
                             $q->where('clinic_id', $clinicId);
                         })

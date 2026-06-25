@@ -166,6 +166,7 @@ class PatientController extends Controller
                 ->paginate(10);
 
               $invoices = $patient->invoices()
+                ->where('is_void', false)
                 ->with(['items'])
                 ->latest()
                 ->paginate(5);

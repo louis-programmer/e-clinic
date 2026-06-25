@@ -58,6 +58,7 @@
         {{ ucfirst($category) }}
     </div>
 
+{{-- OVERRIDE MANUAL INPUT START --}}
     <div style="
         display:grid;
         grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
@@ -127,15 +128,17 @@
                                 @if(config('procedures.manual_price_enabled'))
 
                                     <input type="number"
-                                           name="custom_prices[{{ $procedure->id }}]"
-                                           class="form-input"
-                                           placeholder="Override"
-                                           step="0.01"
-                                           min="0"
-                                           style="
-                                                width:110px;
-                                                margin:0;
-                                           ">
+                                       name="custom_prices[{{ $procedure->id }}]"
+                                       class="form-input override-price"
+                                       data-procedure="{{ $procedure->id }}"
+                                       placeholder="Override"
+                                       step="0.01"
+                                       min="0"
+                                       style="
+                                            width:110px;
+                                            margin:0;
+                                            display:none;
+                                       ">
 
                                 @endif
 
@@ -148,6 +151,8 @@
         @endforeach
 
     </div>
+
+{{-- OVERRIDE MANUAL INPUT END --}}
 
 @endforeach
 
@@ -598,36 +603,29 @@ document.addEventListener('DOMContentLoaded', function () {
         // -------------------------------------------------
         // PROCEDURES
         // -------------------------------------------------
-        checkboxes.forEach(cb => {
-            if (cb.checked) {
-                const manualEnabled = @json(config('procedures.manual_price_enabled'));
+const manualEnabled = @json(config('procedures.manual_price_enabled'));
 
-                    checkboxes.forEach(cb => {
+checkboxes.forEach(cb => {
 
-                        if (!cb.checked) return;
+    if (!cb.checked) return;
 
-                        const id = cb.dataset.id;
+    const id = cb.dataset.id;
 
-                        let price = parseFloat(cb.dataset.price) || 0;
+    let price = parseFloat(cb.dataset.price) || 0;
 
-                        // -------------------------------------------------
-                        // OVERRIDE MODE
-                        // -------------------------------------------------
-                        if (manualEnabled) {
+    if (manualEnabled) {
 
-                            const overrideInput = document.querySelector(
-                                `input[name="custom_prices[${id}]"]`
-                            );
+        const overrideInput = document.querySelector(
+            `input[name="custom_prices[${id}]"]`
+        );
 
-                            if (overrideInput && overrideInput.value !== '') {
-                                price = parseFloat(overrideInput.value) || 0;
-                            }
-                        }
+        if (overrideInput && overrideInput.value !== '') {
+            price = parseFloat(overrideInput.value) || 0;
+        }
+    }
 
-                        subtotal += price;
-                    });
-            }
-        });
+    subtotal += price;
+});
 
         // -------------------------------------------------
         // CUSTOM PROCEDURES (MULTIPLE ROWS)
@@ -665,9 +663,46 @@ document.addEventListener('DOMContentLoaded', function () {
     // =====================================================
     // PROCEDURE EVENTS
     // =====================================================
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', updateCheckoutTotal);
-    });
+        checkboxes.forEach(cb => {
+
+            cb.addEventListener('change', function () {
+
+                const id = cb.dataset.id;
+
+                const overrideInput = document.querySelector(
+                    `input[name="custom_prices[${id}]"]`
+                );
+
+                if (overrideInput) {
+
+                    overrideInput.style.display =
+                        cb.checked ? 'block' : 'none';
+
+                    if (!cb.checked) {
+                        overrideInput.value = '';
+                    }
+                }
+
+                updateCheckoutTotal();
+            });
+
+        });
+
+
+            // =====================================================
+            // live recalculation after checkbox
+            // =====================================================
+        document.addEventListener('input', function (e) {
+
+                if (
+                    e.target.name &&
+                    e.target.name.startsWith('custom_prices[')
+                ) {
+                    updateCheckoutTotal();
+                }
+
+            });
+
 
     // =====================================================
     // DISCOUNT EVENTS
@@ -760,6 +795,7 @@ if (clearBtn) {
         // -------------------------------------------------
         document.querySelectorAll('input[name^="custom_prices"]').forEach(input => {
             input.value = '';
+            input.style.display = 'none';
         });
 
         // -------------------------------------------------

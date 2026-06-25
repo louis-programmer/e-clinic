@@ -110,7 +110,10 @@
     {{-- ===================================================== --}}
     {{-- PATIENT LIST --}}
     {{-- ===================================================== --}}
+    @include('patients.partials.pagination')
+    
     @forelse ($patients as $patient)
+
 
         <div class="card"
              style="
@@ -291,6 +294,8 @@
         </div>
 
     @endforelse
+
+          @include('patients.partials.pagination')
 
 </div>
 <script>

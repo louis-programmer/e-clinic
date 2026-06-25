@@ -237,6 +237,40 @@
                 </div>
             </div>
 
+            <div>
+
+                @if($invoice->canBeVoided())
+
+    <form
+    method="POST"
+    action="{{ route('invoices.void', $invoice) }}"
+    style="display:inline;"
+    onsubmit="
+        const reason = prompt('Reason for voiding this invoice:');
+        if (reason === null) return false;
+        this.querySelector('.void-reason').value = reason;
+    "
+>
+    @csrf
+
+    <input
+        type="hidden"
+        name="void_reason"
+        class="void-reason"
+    >
+
+    <button
+        type="submit"
+        class="btn btn-danger"
+    >
+        Void Invoice
+    </button>
+
+</form>
+
+@endif
+            </div>
+
         </div>
 
     </div>
