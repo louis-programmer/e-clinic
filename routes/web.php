@@ -23,6 +23,8 @@ use App\Modules\Patients\Controllers\DentalChartController;
 
 use App\Http\Controllers\ClinicProfileController;
 
+use App\Modules\Patients\Controllers\PatientImportController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +65,30 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('patients')->group(function () {
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | import
+        |--------------------------------------------------------------------------
+        */
+
+                    Route::get(
+                '/import',
+                [PatientImportController::class, 'index']
+            )->name('patients.import');
+
+            Route::post(
+                '/import',
+                [PatientImportController::class, 'store']
+            )->name('patients.import.store');
+
+
+
+
 
         Route::get('/', [PatientController::class, 'index'])
             ->name('patients.index');
@@ -164,6 +190,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/{patient}/dental-chart', [DentalChartController::class, 'store'])
     ->name('dental-chart.store');
 
+
+
     });
 
 
@@ -249,6 +277,7 @@ Route::middleware('auth')->group(function () {
     | Clinic Profile
     |--------------------------------------------------------------------------
     */
+    /*
         Route::get(
             '/clinic-profile',
             [ClinicProfileController::class, 'edit']
@@ -258,7 +287,16 @@ Route::middleware('auth')->group(function () {
             '/clinic-profile',
             [ClinicProfileController::class, 'update']
         );
+*/
+        Route::get(
+            '/clinic-profile',
+            [ClinicProfileController::class, 'edit']
+        )->name('clinic-profile.edit');
 
+        Route::post(
+            '/clinic-profile',
+            [ClinicProfileController::class, 'update']
+        )->name('clinic-profile.update');
 
 
 });

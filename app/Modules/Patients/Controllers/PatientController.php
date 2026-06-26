@@ -97,6 +97,17 @@ class PatientController extends Controller
 
         $validated['patient_code'] = (string) Str::uuid();
 
+        /*
+            #### clinic id format:
+            date instance installed year month
+                client number in 3 digits 000 001 002
+                    Branch count   2 digits 00 01 02
+                        PC count   2 digits 00 01 002
+        */
+
+        #$validated['clinic_id'] = 20260600101; // hardcoded clinic ID
+        $validated['clinic_id'] = config('clinic.id');
+        
         $patient = Patient::create($validated);
 
         return redirect('/patients/' . $patient->id)

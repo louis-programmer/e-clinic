@@ -139,52 +139,79 @@ Tab for Dental chart
         $surfaces = ['top','left','center','right','bottom'];
     @endphp
 
-    @foreach([
-        ['label' => 'Upper Jaw', 'left' => $upperRight, 'right' => $upperLeft],
-        ['label' => 'Lower Jaw', 'left' => $lowerRight, 'right' => $lowerLeft],
-    ] as $row)
+{{-- ===================================================== --}}
+{{-- UPPER PEDIATRIC --}}
+{{-- ===================================================== --}}
 
-        <div style="text-align:center;font-weight:700;margin:15px 0;">
-            {{ $row['label'] }}
-        </div>
+<div style="display:flex;justify-content:center;gap:25px;margin-bottom:20px;flex-wrap:wrap;">
 
-        <div style="display:flex;justify-content:center;gap:25px;margin-bottom:25px;flex-wrap:wrap;">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+        @foreach($primaryUpperRight as $tooth)
+            @include('patients.partials.tooth', compact('tooth', 'surfaces'))
+        @endforeach
+    </div>
 
-            <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;">
-                @foreach($row['left'] as $tooth)
-                    @include('patients.partials.tooth', compact('tooth', 'surfaces'))
-                @endforeach
-            </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+        @foreach($primaryUpperLeft as $tooth)
+            @include('patients.partials.tooth', compact('tooth', 'surfaces'))
+        @endforeach
+    </div>
 
-            <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;">
-                @foreach($row['right'] as $tooth)
-                    @include('patients.partials.tooth', compact('tooth', 'surfaces'))
-                @endforeach
-            </div>
+</div>
 
-        </div>
-
-    @endforeach
+    {{-- ===================================================== --}}
+    {{-- UPPER PERMANENT --}}
+    {{-- ===================================================== --}}
 
     <div style="text-align:center;font-weight:700;margin:15px 0;">
-        Pediatric Teeth
+        Upper Jaw
     </div>
 
-    <div style="display:flex;justify-content:center;gap:25px;flex-wrap:wrap;">
+    <div style="display:flex;justify-content:center;gap:25px;margin-bottom:25px;flex-wrap:wrap;">
 
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
-            @foreach($primaryUpperRight as $tooth)
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;">
+            @foreach($upperRight as $tooth)
                 @include('patients.partials.tooth', compact('tooth', 'surfaces'))
             @endforeach
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
-            @foreach($primaryUpperLeft as $tooth)
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;">
+            @foreach($upperLeft as $tooth)
                 @include('patients.partials.tooth', compact('tooth', 'surfaces'))
             @endforeach
         </div>
 
     </div>
+
+
+    {{-- ===================================================== --}}
+    {{-- LOWER PERMANENT --}}
+    {{-- ===================================================== --}}
+
+    <div style="text-align:center;font-weight:700;margin:15px 0;">
+        Lower Jaw
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:25px;margin-bottom:25px;flex-wrap:wrap;">
+
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;">
+            @foreach($lowerRight as $tooth)
+                @include('patients.partials.tooth', compact('tooth', 'surfaces'))
+            @endforeach
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;">
+            @foreach($lowerLeft as $tooth)
+                @include('patients.partials.tooth', compact('tooth', 'surfaces'))
+            @endforeach
+        </div>
+
+    </div>
+         
+
+  
+
+    
 
     <div style="height:15px;"></div>
 
@@ -204,6 +231,8 @@ Tab for Dental chart
 
     </div>
 </div>
+
+
 
 {{-- ===================================================== --}}
 {{-- STYLES --}}

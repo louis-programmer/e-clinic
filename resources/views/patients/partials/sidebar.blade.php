@@ -1,3 +1,6 @@
+<!-- 
+updated to ba a header
+-->
 <div class="card" style="width:320px; min-width:320px; position:sticky; top:20px;">
 
     {{-- PATIENT IMAGE --}}

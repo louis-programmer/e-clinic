@@ -25,6 +25,13 @@ class Patient extends Model
         'contact_number',
         'email',
         'address',
+        'occupation',
+        'tags',
+        'legacy_id',
+        'is_legacy',
+        'civil_status',
+
+
     ];
 
 

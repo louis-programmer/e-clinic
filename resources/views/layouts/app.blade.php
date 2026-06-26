@@ -139,8 +139,8 @@ textarea {
             Patients
         </a>
 
-        <a href="#" class="nav-item">
-            Encounters
+        <a href="{{ route('clinic-profile.edit') }}" class="nav-item">
+            Clinic Profile
         </a>
 
     </nav>
@@ -211,6 +211,8 @@ textarea {
         <strong>Dashboard</strong>
     </div>
 
+    <!--
+
 {{-- CENTER (SEARCH + BUTTON) --}}
 <div style="flex:1; display:flex; justify-content:center; gap:8px;">
 
@@ -241,6 +243,8 @@ textarea {
     >
         Search
     </button>
+-->
+
 
 </div>
 
