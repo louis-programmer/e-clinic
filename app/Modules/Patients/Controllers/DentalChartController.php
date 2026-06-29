@@ -11,6 +11,24 @@ use App\Models\PatientTooth;
 
 class DentalChartController extends Controller
 {
+
+    public function __construct()
+        {
+            $this->middleware('auth');
+
+            $this->middleware(
+                'role:' . implode(',', config('roles.dental_diagram'))
+            )->only([
+                'index',
+                'show',
+                'save',
+                'store',
+                'update',
+                'destroy',
+            ]);
+        }
+
+
     /*
     |--------------------------------------------------------------------------
     | LOAD CHART

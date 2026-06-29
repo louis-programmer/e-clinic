@@ -2,6 +2,10 @@
 
 @section('content')
 
+@if(auth()->user()->hasAnyRole(config('roles.clinic_profile_manage')))
+
+    {{-- Entire form here --}}
+
 
 <div class="card">
 
@@ -463,3 +467,12 @@
 </div>
 
 @endsection
+
+
+@else
+
+    <div class="card">
+        You do not have permission to access this page.
+    </div>
+
+@endif

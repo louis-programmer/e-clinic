@@ -139,6 +139,16 @@ $newPatientsLastSixMonths = Patient::where(
                         ->where('is_void', false)
                         ->where('status', '!=', 'paid')
                         ->count();
+
+                            // making invoices metrics upgrade
+                        $unpaidInvoiceList = \App\Models\Invoice::with('patient')
+                            ->whereHas('patient', function ($q) use ($clinicId) {
+                                $q->where('clinic_id', $clinicId);
+                            })
+                            ->where('is_void', false)
+                            ->where('status', '!=', 'paid')
+                            ->orderBy('created_at')
+                            ->get();
    
 
                 $totalOutstandingBalance = \App\Models\Invoice::whereHas('patient', function ($q) use ($clinicId) {
@@ -246,6 +256,7 @@ $newPatientsLastSixMonths = Patient::where(
                 'newPatientsLastSixMonths',
                 'todayRevenue',
                 'unpaidInvoices',
+                'unpaidInvoiceList',   // ← ADD THIS
                 'totalOutstandingBalance',
                 'patientsSeenToday',
                 'monthlyRevenueLast6Months',

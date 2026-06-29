@@ -2,6 +2,27 @@
 
 @section('content')
 
+@php
+
+$canProgressNotes = auth()->user()->canAccess('progress_notes');
+
+$canOverviewHistory = auth()->user()->canAccess('overview_history');
+
+$canPatientPhotos = auth()->user()->canAccess('patient_photos');
+
+$canEncounter = auth()->user()->canAccess('encounter_view');
+
+$canPatientXrays = auth()->user()->canAccess('patient_xrays');
+
+$canPatientForms = auth()->user()->canAccess('patient_forms');
+
+$canAppointments = auth()->user()->canAccess('appointments');
+
+$canDentalDiagram = auth()->user()->canAccess('dental_diagram');
+
+@endphp
+
+
 <!-- ===================================================== -->
 <!-- PATIENT HEADER -->
 <!-- ===================================================== -->
@@ -46,6 +67,7 @@
     {{-- PATIENT IMAGE --}}
     @if(($patient->images ?? collect())->count())
 
+<!--
         <img src="{{ asset('storage/' . $patient->images->first()->file_path) }}"
              style="
                 width:120px;
@@ -54,6 +76,24 @@
                 object-fit:cover;
                 border:4px solid #e2e8f0;
              ">
+
+    -->
+
+    <!-- temporary default -->
+
+      <div style="
+            width:120px;
+            height:120px;
+            border-radius:50%;
+            background:#e2e8f0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:42px;
+            color:#64748b;
+        ">
+            👤
+        </div>
 
     @else
 
@@ -248,43 +288,65 @@
         overflow-x:auto;
     ">
 
-        <button class="tab-btn active-tab" data-tab="overview">
-            History Overview
-        </button>
+        @if($canOverviewHistory)
 
-         <button class="tab-btn" data-tab="notes">
-            Procedures
-        </button>
+            <button class="tab-btn active-tab" data-tab="overview">
+                History Overview
+            </button>
+        @endif
 
+         @if($canProgressNotes)
+             <button class="tab-btn" data-tab="notes">
+                Procedures
+            </button>
+         @endif   
+
+<!-- hidden for production | for dev -->
+<!--
          <button class="tab-btn" data-tab="notes2">
             Patient Notes
         </button>
 
+-->
+        
+         @if($canEncounter)
+            <button class="tab-btn" data-tab="encounters">
+                Consultation
+            </button>
+         @endif   
 
-        <button class="tab-btn" data-tab="encounters">
-            Encounter
-        </button>
 
-        <button class="tab-btn" data-tab="photos">
-            Dental Photos
-        </button>
+       @if($canPatientPhotos)
+            <button class="tab-btn" data-tab="photos">
+                Dental Photos
+            </button>
+        @endif
 
-        <button class="tab-btn" data-tab="xrays">
-            X-Rays
-        </button>
+          @if($canPatientXrays)
+            <button class="tab-btn" data-tab="xrays">
+                X-Rays
+            </button>
+         @endif
 
-        <button class="tab-btn" data-tab="dental-chart">
-            Dental Diagram
-        </button>
+         @if($canDentalDiagram)
+            <button class="tab-btn" data-tab="dental-chart">
+                Dental Diagram
+            </button>
+           @endif
+           
 
-        <button class="tab-btn" data-tab="appointments">
-            Appointments
-        </button>
+        @if($canAppointments)
+            <button class="tab-btn" data-tab="appointments">
+                Appointments
+            </button>
+          @endif
+          
 
-        <button class="tab-btn" data-tab="forms">
-            Forms
-        </button>
-
+          @if($canPatientForms)    
+            <button class="tab-btn" data-tab="forms">
+                Forms
+            </button>
+          @endif
     </div>
 
 

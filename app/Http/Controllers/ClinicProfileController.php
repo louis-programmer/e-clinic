@@ -8,6 +8,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ClinicProfileController extends Controller
 {
+
+    public function __construct()
+        {
+            $this->middleware('auth');
+
+            $this->middleware(
+                'role:' . implode(',', config('roles.clinic_profile_manage'))
+            );
+        }
+
+
     public function edit()
     {
         $profile = ClinicProfile::firstOrCreate(

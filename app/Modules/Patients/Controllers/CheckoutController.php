@@ -11,6 +11,17 @@ use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
+
+    public function __construct()
+        {
+            $this->middleware('auth');
+
+            $this->middleware(
+                'role:' . implode(',', config('roles.progress_notes'))
+            );
+        }
+
+
     public function store(Request $request, Patient $patient)
     {
         $this->authorize('update', $patient);
@@ -36,6 +47,15 @@ class CheckoutController extends Controller
             'discount_type' => 'nullable|in:percent,fixed',
             'discount_value' => 'nullable|numeric|min:0|max:100000',
             'signature' => 'nullable|string',
+
+                // NEW
+            // added so we can save old records(date)
+                'procedure_date' => [
+                    'required',
+                    'date',
+                ],
+
+
 
         ]);
 
@@ -133,13 +153,19 @@ class CheckoutController extends Controller
             // CREATE INVOICE
             // =====================================================
 
-            $signaturePath = null;
+
+            // =====================================================
+            // patient e-signature START
+            // =====================================================
+
+
+                $signaturePath = null;
 
                 if (!empty($validated['signature'])) {
 
                     $signatureData = $validated['signature'];
 
-                    // remove base64 header
+                    // Remove base64 header
                     $signatureData = preg_replace(
                         '#^data:image/\w+;base64,#i',
                         '',
@@ -157,13 +183,25 @@ class CheckoutController extends Controller
                             time() .
                             '.png';
 
-                        $path = 'invoice-signatures/' . $filename;
+                    $folder = config('clinic.images.base_path')
+                        . '/'
+                        . $patient->id
+                        . '/'
+                        . config('clinic.folders.signatures');
 
-                        \Storage::put($path, $signatureBinary);
+                        $path = $folder . '/' . $filename;
+
+                        \Storage::disk('public')->put(
+                            $path,
+                            $signatureBinary
+                        );
 
                         $signaturePath = $path;
                     }
                 }
+                // =====================================================
+                // patient e-signature END
+                // =====================================================
 
 
             $invoice = $patient->invoices()->create([
@@ -179,6 +217,11 @@ class CheckoutController extends Controller
                 'remarks' => $validated['remarks'] ?? null,
                 'signature_path' => $signaturePath,
                 'created_by' => auth()->id(),
+
+                // added for recording old records
+                'created_at' => $validated['procedure_date'],
+                'updated_at' => $validated['procedure_date'],
+
             ]);
 
             // =====================================================

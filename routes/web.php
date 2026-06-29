@@ -25,6 +25,7 @@ use App\Http\Controllers\ClinicProfileController;
 
 use App\Modules\Patients\Controllers\PatientImportController;
 
+use App\Modules\Users\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -298,5 +299,27 @@ Route::middleware('auth')->group(function () {
             [ClinicProfileController::class, 'update']
         )->name('clinic-profile.update');
 
+
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Users
+            |--------------------------------------------------------------------------
+            */
+
+                      Route::prefix('users')->group(function () {
+
+                Route::get('/', [UserController::class, 'index'])
+                    ->name('users.index');
+
+                Route::get('/create', [UserController::class, 'create'])
+                    ->name('users.create');
+
+                Route::post('/', [UserController::class, 'store'])
+                    ->name('users.store');
+
+            });
 
 });

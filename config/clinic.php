@@ -17,4 +17,36 @@ return [
 
     'id' => 20260600101,
 
+
+
+    'images' => [
+
+        'base_path' => 'patients',
+
+        'photo_max_size' => 5120, // 5 MB
+
+        'xray_max_size' => 10240, // 10 MB
+
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Patient Folders
+    |--------------------------------------------------------------------------
+    */
+
+    'folders' => [
+
+        'photos' => 'photos',
+
+        'xrays' => 'xrays',
+
+        'forms' => 'forms',
+
+        'signatures' => 'signatures',
+
+    ],
+
+
 ];

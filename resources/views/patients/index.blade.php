@@ -87,7 +87,7 @@
 
 
 
-
+<!--
 
             {{-- CALENDAR BUTTON --}}
             <button class="btn"
@@ -98,6 +98,7 @@
                     ">
                 📅 Calendar
             </button>
+                -->
 
         </div>
 
@@ -145,7 +146,7 @@
                     <div>
 
                         @if(($patient->images ?? collect())->count())
-
+<!--
                             <img src="{{ asset('storage/' . $patient->images->first()->file_path) }}"
                                  style="
                                     width:64px;
@@ -154,6 +155,21 @@
                                     object-fit:cover;
                                     border:3px solid #e2e8f0;
                                  ">
+                        -->
+<!-- temporary defaults -->
+                         <div style="
+                                width:64px;
+                                height:64px;
+                                border-radius:50%;
+                                background:#e2e8f0;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                font-size:22px;
+                                color:#64748b;
+                            ">
+                                👤
+                            </div>
 
                         @else
 

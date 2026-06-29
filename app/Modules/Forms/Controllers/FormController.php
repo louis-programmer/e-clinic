@@ -9,6 +9,20 @@ use App\Modules\Forms\Models\PatientForm;
 
 class FormController extends Controller
 {
+
+
+
+
+    public function __construct()
+            {
+                $this->middleware('auth');
+
+                $this->middleware(
+                    'role:' . implode(',', config('roles.patient_forms'))
+                );
+            }
+
+
    public function store(Request $request, Patient $patient)
     {
 
@@ -24,7 +38,7 @@ class FormController extends Controller
             'file' => [
                     'required',
                     'file',
-                    'max:10240',
+                    'max:20480',
 
                     // extensions
                     'mimes:jpg,jpeg,png,pdf',
@@ -41,9 +55,16 @@ class FormController extends Controller
                     '.' .
                     $request->file('file')->getClientOriginalExtension();
 
+               $folder = config('clinic.images.base_path')
+                    . '/'
+                    . $patient->id
+                    . '/'
+                    . config('clinic.folders.forms');
+
                 $path = $request->file('file')->storeAs(
-                    'patient-forms',
-                    $filename
+                    $folder,
+                    $filename,
+                    'public'
                 );
 
         PatientForm::create([
@@ -66,7 +87,7 @@ class FormController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $path = storage_path('app/' . $form->file_path);
+        $path = storage_path('app/public/' . $form->file_path);
 
         if (!file_exists($path)) {
             abort(404);
@@ -84,7 +105,7 @@ class FormController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        Storage::delete($form->file_path);
+       Storage::disk('public')->delete($form->file_path);
 
         $form->delete();
 

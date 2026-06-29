@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
+        'clinic_id',
     ];
 
     /**
@@ -65,12 +66,24 @@ class User extends Authenticatable
             ->exists();
     }
 
-//instead of repeating everywhere:@if(auth()->check() && auth()->user()->hasRole('admin'))
-    public function hasAnyRole(...$roles)
-    {
-        return $this->roles()
-            ->whereIn('name', $roles)
-            ->exists();
+public function hasAnyRole(...$roles)
+{
+    // Allow passing an array
+    if (count($roles) === 1 && is_array($roles[0])) {
+        $roles = $roles[0];
     }
+
+    return $this->roles()
+        ->whereIn('name', $roles)
+        ->exists();
+}
+
+
+public function canAccess(string $permission): bool
+{
+    return $this->hasAnyRole(config("roles.$permission", []));
+}
+
+
 
 }

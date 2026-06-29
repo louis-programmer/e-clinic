@@ -15,20 +15,13 @@ class PatientImageController extends Controller
 
   
 
-         $this->middleware(
-            'role:' . implode(',', config('roles.patient_photos'))
-        )->only([
-            'store',
-        ]);
-             
         $this->middleware(
             'role:' . implode(',', config('roles.patient_photos'))
-        )->only([
-            'destroy',
-        ]);
+        );
 
 
     }
+
 
        public function store(Request $request, Patient $patient)
         {
@@ -36,7 +29,8 @@ class PatientImageController extends Controller
             $this->authorize('update', $patient);
 
             $validated = $request->validate([
-                'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+                #'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+                'image' => 'required|image|mimes:jpg,jpeg,png|max:20480',
                 'type'  => 'required|in:photo,xray',
             ]);
 
@@ -49,9 +43,33 @@ class PatientImageController extends Controller
             // safer filename
             $filename = uniqid() . '_' . time() . '.' . $request->file('image')->getClientOriginalExtension();
 
+/*
                 $folder = $type === 'xray'
                     ? 'patients/xrays'
                     : 'patients/photos';
+
+*/
+
+/*
+                    $folder = 'patients/'
+                        . $patient->id
+                        . '/'
+                        . ($type === 'xray' ? 'xrays' : 'photos');
+
+*/
+
+                        // uses clinic config
+                       $folder = config('clinic.images.base_path')
+                                . '/'
+                                . $patient->id
+                                . '/'
+                                . (
+                                    $type === 'xray'
+                                        ? config('clinic.folders.xrays')
+                                        : config('clinic.folders.photos')
+                                );
+
+
 
                 $path = $request->file('image')->storeAs(
                     $folder,

@@ -18,6 +18,18 @@
 @extends('layouts.app')
 
 @section('content')
+
+@php
+
+$canStatistics = auth()->user()->hasAnyRole(config('roles.dashboard_statistics'));
+
+$canFinancial = auth()->user()->hasAnyRole(config('roles.dashboard_financial'));
+
+$canReports = auth()->user()->hasAnyRole(config('roles.dashboard_reports'));
+
+@endphp
+
+
 {{-- ===================================================== --}}
 {{-- WATERMARK LOGO (CIRCULAR + SAFE BOX) --}}
 {{-- ===================================================== --}}
@@ -450,218 +462,227 @@ document.addEventListener('DOMContentLoaded', function () {
 @endif
 
 
+    
+   @if($canStatistics)
+    {{-- ===================================================== --}}
+    {{-- STATS --}}
+    {{-- ===================================================== --}}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
 
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
 
-{{-- ===================================================== --}}
-{{-- STATS --}}
-{{-- ===================================================== --}}
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
+        {{-- TOTAL PATIENTS --}}
+        <a href="/patients" style="text-decoration:none; color:inherit;">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                            Total Patients
+                        </div>
 
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
+                        <div style="font-size:34px; font-weight:700;">
+                            {{ number_format($totalPatients) }}
+                        </div>
+                    </div>
 
-    {{-- TOTAL PATIENTS --}}
-    <a href="/patients" style="text-decoration:none; color:inherit;">
+                    <div style="font-size:42px;">
+                        👥
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        {{-- NEW THIS MONTH --}}
         <div class="card">
+
             <div style="display:flex; justify-content:space-between; align-items:center;">
+
                 <div>
                     <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-                        Total Patients
+                        New Patients This Month
                     </div>
 
                     <div style="font-size:34px; font-weight:700;">
-                        {{ number_format($totalPatients) }}
+                        {{ number_format($newPatientsThisMonth) }}
                     </div>
                 </div>
 
                 <div style="font-size:42px;">
-                    👥
-                </div>
-            </div>
-        </div>
-    </a>
-
-    {{-- NEW THIS MONTH --}}
-    <div class="card">
-
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-
-            <div>
-                <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-                    New Patients This Month
+                    ✨
                 </div>
 
-                <div style="font-size:34px; font-weight:700;">
-                    {{ number_format($newPatientsThisMonth) }}
-                </div>
-            </div>
-
-            <div style="font-size:42px;">
-                ✨
             </div>
 
         </div>
 
-    </div>
+        {{-- LAST 6 MONTHS --}}
+        <div class="card">
 
-    {{-- LAST 6 MONTHS --}}
-    <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
 
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                        New Patients (6 Months)
+                    </div>
 
-            <div>
-                <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-                    New Patients (6 Months)
+                    <div style="font-size:34px; font-weight:700;">
+                        {{ number_format($newPatientsLastSixMonths) }}
+                    </div>
                 </div>
 
-                <div style="font-size:34px; font-weight:700;">
-                    {{ number_format($newPatientsLastSixMonths) }}
+                <div style="font-size:42px;">
+                    📈
                 </div>
-            </div>
 
-            <div style="font-size:42px;">
-                📈
             </div>
 
         </div>
 
     </div>
 
-</div>
 
+   @if($canFinancial)
+    {{-- ===================================================== --}}
+    {{-- FINANCIAL OVERVIEW --}}
+    {{-- ===================================================== --}}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
 
-
-{{-- ===================================================== --}}
-{{-- FINANCIAL OVERVIEW --}}
-{{-- ===================================================== --}}
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:20px;">
-
-    {{-- TODAY REVENUE --}}
-    <div class="card">
-        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-            Today's Revenue
-        </div>
-
-        <div style="font-size:34px; font-weight:700;">
-            ₱{{ number_format($todayRevenue, 2) }}
-        </div>
-    </div>
-
-    {{-- OUTSTANDING BALANCE --}}
-    <div class="card">
-        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-            Total Outstanding Balance
-        </div>
-
-        <div style="font-size:34px; font-weight:700; color:#dc2626;">
-            ₱{{ number_format($totalOutstandingBalance, 2) }}
-        </div>
-    </div>
-
-    {{-- UNPAID INVOICES --}}
-    <div class="card">
-        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-            Unpaid Invoices
-        </div>
-
-        <div style="font-size:34px; font-weight:700;">
-            {{ number_format($unpaidInvoices) }}
-        </div>
-    </div>
-
-    {{-- PATIENTS SEEN TODAY --}}
-    <div class="card">
-        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
-            Patients Seen Today
-        </div>
-
-        <div style="font-size:34px; font-weight:700;">
-            {{ number_format($patientsSeenToday) }}
-        </div>
-    </div>
-
-</div>
-
-
-<div class="card" style="margin-top:20px;">
-
-    <h3>💰 Revenue (Last 6 Months)</h3>
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
-
-        @foreach($monthlyRevenueLast6Months as $month)
-            <div style="
-                padding:12px;
-                border:1px solid #e2e8f0;
-                border-radius:10px;
-                text-align:center;
-            ">
-                <div style="font-size:13px; color:#64748b;">
-                    {{ $month->month }}
-                </div>
-
-                <div style="font-size:18px; font-weight:700;">
-                    ₱{{ number_format($month->total, 2) }}
-                </div>
+        {{-- TODAY REVENUE --}}
+        <div class="card">
+            <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                Today's Revenue
             </div>
-        @endforeach
+
+            <div style="font-size:34px; font-weight:700;">
+                ₱{{ number_format($todayRevenue, 2) }}
+            </div>
+        </div>
+
+        {{-- OUTSTANDING BALANCE --}}
+        <div class="card">
+            <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                Total Outstanding Balance
+            </div>
+
+            <div style="font-size:34px; font-weight:700; color:#dc2626;">
+                ₱{{ number_format($totalOutstandingBalance, 2) }}
+            </div>
+        </div>
+
+        {{-- UNPAID INVOICES --}}
+        <div
+            class="card"
+            onclick="openUnpaidInvoices()"
+            style="cursor:pointer;"
+        >
+            <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                Unpaid Invoices
+            </div>
+
+            <div style="font-size:34px; font-weight:700;">
+                {{ number_format($unpaidInvoices) }}
+            </div>
+        </div>
+       
+
+        {{-- PATIENTS SEEN TODAY --}}
+        <div class="card">
+            <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                Patients Seen Today
+            </div>
+
+            <div style="font-size:34px; font-weight:700;">
+                {{ number_format($patientsSeenToday) }}
+            </div>
+        </div>
 
     </div>
+     @endif
 
-</div>
 
+        @if($canReports)
+           <div class="card" style="margin-top:20px;">
 
-<div class="card" style="margin-top:20px;">
+        <h3>💰 Revenue (Last 6 Months)</h3>
 
-   <h3>🏆 Top Treatments (By Revenue)</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
 
-        <div style="
-            overflow-x:auto;
-            width:100%;
-        ">
+            @foreach($monthlyRevenueLast6Months as $month)
+                <div style="
+                    padding:12px;
+                    border:1px solid #e2e8f0;
+                    border-radius:10px;
+                    text-align:center;
+                ">
+                    <div style="font-size:13px; color:#64748b;">
+                        {{ $month->month }}
+                    </div>
 
-            <table style="
-                width:100%;
-                min-width:500px;
-                border-collapse:collapse;
-            ">
-
-        <thead>
-            <tr>
-                <th style="text-align:left;">Treatment</th>
-                <th>Times Used</th>
-                <th style="text-align:right;">Revenue</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            @foreach($topTreatments as $treatment)
-                <tr style="border-top:1px solid #e2e8f0;">
-                    
-                    <td style="padding:10px;">
-                        {{ $treatment->procedure->name ?? $treatment->description ?? 'Unknown' }}
-                    </td>
-
-                    <td style="text-align:center;">
-                        {{ $treatment->count }}
-                    </td>
-
-                    <td style="text-align:right; font-weight:700;">
-                        ₱{{ number_format($treatment->revenue, 2) }}
-                    </td>
-
-                </tr>
+                    <div style="font-size:18px; font-weight:700;">
+                        ₱{{ number_format($month->total, 2) }}
+                    </div>
+                </div>
             @endforeach
 
-        </tbody>
+        </div>
 
-    </table>
+    </div>
+  
 
-    </table>
+    <div class="card" style="margin-top:20px;">
 
-</div>
+       <h3>🏆 Top Treatments (By Revenue)</h3>
 
-</div>
+            <div style="
+                overflow-x:auto;
+                width:100%;
+            ">
+
+                <table style="
+                    width:100%;
+                    min-width:500px;
+                    border-collapse:collapse;
+                ">
+
+            <thead>
+                <tr>
+                    <th style="text-align:left;">Treatment</th>
+                    <th>Times Used</th>
+                    <th style="text-align:right;">Revenue</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach($topTreatments as $treatment)
+                    <tr style="border-top:1px solid #e2e8f0;">
+                        
+                        <td style="padding:10px;">
+                            {{ $treatment->procedure->name ?? $treatment->description ?? 'Unknown' }}
+                        </td>
+
+                        <td style="text-align:center;">
+                            {{ $treatment->count }}
+                        </td>
+
+                        <td style="text-align:right; font-weight:700;">
+                            ₱{{ number_format($treatment->revenue, 2) }}
+                        </td>
+
+                    </tr>
+                @endforeach
+
+            </tbody>
+
+        </table>
+
+        </table>
+
+         </div>
+         @endif
+
+    </div>
+    @endif
 
 {{-- ===================================================== --}}
 {{-- FUTURE MIDDLE SECTION (placeholder for expansion) --}}
@@ -712,9 +733,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             {{ $appointment->appointment_date->format('h:i A') }}
                         </div>
 
-                        <div style="font-size:18px; font-weight:700;">
+                       <a
+                            href="{{ route('patients.show', $appointment->patient) }}"
+                            style="
+                                font-size:18px;
+                                font-weight:700;
+                                color:#2563eb;
+                                text-decoration:none;
+                            "
+                            onmouseover="this.style.textDecoration='underline'"
+                            onmouseout="this.style.textDecoration='none'"
+                        >
                             {{ $appointment->patient->full_name }}
-                        </div>
+                        </a>
 
                         <div style="color:#475569;">
                             {{ $appointment->purpose ?? 'General Consultation' }}
@@ -734,6 +765,136 @@ document.addEventListener('DOMContentLoaded', function () {
     @endif
 
 </div>
+        <!-- pop up -->
+        <div
+            id="unpaidInvoicesModal"
+            style="
+                display:none;
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.45);
+                z-index:9999;
+            "
+        >
+
+            <div style="
+                background:white;
+                width:900px;
+                max-width:95%;
+                margin:60px auto;
+                border-radius:12px;
+                padding:20px;
+                max-height:80vh;
+                overflow:auto;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:20px;
+                ">
+
+                    <h2 style="margin:0;">
+                        Unpaid Invoices
+                    </h2>
+
+                    <button
+                        class="btn"
+                        onclick="closeUnpaidInvoices()"
+                    >
+                        Close
+                    </button>
+
+                </div>
+
+                <table style="
+                    width:100%;
+                    border-collapse:collapse;
+                ">
+
+                    <thead>
+
+                        <tr>
+
+                            <th style="text-align:left;">Invoice</th>
+
+                            <th style="text-align:left;">Patient</th>
+
+                            <th>Date</th>
+
+                            <th style="text-align:right;">
+                                Balance
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    @foreach($unpaidInvoiceList as $invoice)
+
+                        <tr style="border-top:1px solid #e2e8f0;">
+
+                            <td style="padding:10px;">
+
+                                <a href="{{ route('invoices.show',$invoice) }}">
+
+                                    {{ $invoice->invoice_number }}
+
+                                </a>
+
+                            </td>
+
+                            <td>
+
+                                <a href="{{ route('patients.show',$invoice->patient) }}">
+
+                                    {{ $invoice->patient->full_name }}
+
+                                </a>
+
+                            </td>
+
+                            <td>
+
+                                {{ $invoice->created_at->format('M d, Y') }}
+
+                            </td>
+
+                            <td style="text-align:right;">
+
+                                ₱{{ number_format($invoice->balance,2) }}
+
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <script>
+
+            function openUnpaidInvoices()
+            {
+                document.getElementById('unpaidInvoicesModal').style.display = 'block';
+            }
+
+            function closeUnpaidInvoices()
+            {
+                document.getElementById('unpaidInvoicesModal').style.display = 'none';
+            }
+
+         </script>
 
 @endsection
 

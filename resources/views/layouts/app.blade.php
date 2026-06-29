@@ -271,10 +271,11 @@ textarea {
 
 
 <!-- REMINDER BUTTON -->
+<!-- hide the starter
 <div id="reminder-fab">
     <button type="button" onclick="toggleReminders()">+</button>
 </div>
-
+-->
 
 <!-- REMINDER DRAWER -->
 <div id="reminder-drawer">

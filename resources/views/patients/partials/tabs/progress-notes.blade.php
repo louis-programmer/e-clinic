@@ -43,6 +43,26 @@
                 Select Procedures
             </label>
 
+            {{-- Procedure Date --}}
+                <div style="margin-bottom:15px; max-width:240px;">
+
+                    <label style="
+                        display:block;
+                        margin-bottom:6px;
+                        font-weight:600;
+                    ">
+                        Procedure Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="procedure_date"
+                        class="form-input"
+                        value="{{ now()->toDateString() }}"
+                    >
+
+                </div>
+
 @foreach($procedures as $category => $categoryProcedures)
 
     {{-- CATEGORY HEADER --}}

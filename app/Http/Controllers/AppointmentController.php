@@ -13,24 +13,28 @@ class AppointmentController extends Controller
 {
     protected AppointmentService $appointmentService;
 
-    public function __construct(AppointmentService $appointmentService)
-    {
-        $this->appointmentService = $appointmentService;
+        public function __construct(AppointmentService $appointmentService)
+        {
+            $this->appointmentService = $appointmentService;
 
-        $this->middleware('role:admin,staff,doctor')
-            ->only([
+            $this->middleware('auth');
+
+            $this->middleware(
+                'role:' . implode(',', config('roles.appointments'))
+            )->only([
                 'store',
                 'complete',
                 'cancel',
                 'reschedule',
-                'noShow'
+                'noShow',
             ]);
 
-        $this->middleware('role:admin')
-            ->only([
-                'destroy'
+            $this->middleware(
+                'role:' . implode(',', config('roles.patient_manage'))
+            )->only([
+                'destroy',
             ]);
-    }
+        }
 
     /*
     |--------------------------------------------------------------------------
