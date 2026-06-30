@@ -129,21 +129,34 @@ textarea {
         </a>
     </div>
 
-    <nav class="app-sidebar-nav">
+       <nav class="app-sidebar-nav">
 
-        <a href="/" class="nav-item {{ request()->is('/') ? 'active' : '' }}">
-            Dashboard
-        </a>
+                <a href="/" class="nav-item {{ request()->is('/') ? 'active' : '' }}">
+                    📊 Dashboard
+                </a>
 
-        <a href="/patients" class="nav-item {{ request()->is('patients*') ? 'active' : '' }}">
-            Patients
-        </a>
+                <a href="/patients" class="nav-item {{ request()->is('patients*') ? 'active' : '' }}">
+                    👨‍⚕️ Patients
+                </a>
 
-        <a href="{{ route('clinic-profile.edit') }}" class="nav-item">
-            Clinic Profile
-        </a>
+             
 
-    </nav>
+                @if(auth()->user()->canAccess('user_manage'))
+
+                   <a href="{{ route('clinic-profile.edit') }}" class="nav-item">
+                    🏥 Clinic Profile
+                   </a>
+
+                    <a
+                        href="{{ route('users.index') }}"
+                        class="nav-item {{ request()->is('users*') ? 'active' : '' }}"
+                    >
+                        👥 Users
+                    </a>
+
+                @endif
+
+         </nav>
 
 <style>
     .app-sidebar {

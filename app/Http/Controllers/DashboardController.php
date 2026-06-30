@@ -99,7 +99,8 @@ $newPatientsLastSixMonths = Patient::where(
         | Monthly Appointments
         |--------------------------------------------------------------------------
         */
-        $appointmentsRaw = Appointment::whereHas('patient', function ($q) {
+        $appointmentsRaw = Appointment::with('patient')
+            ->whereHas('patient', function ($q) {
                 $q->where('clinic_id', auth()->user()->clinic_id);
             })
             ->whereBetween('appointment_date', [

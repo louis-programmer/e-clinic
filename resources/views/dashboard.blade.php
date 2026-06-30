@@ -957,16 +957,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     $dateKey = $day->format('Y-m-d');
                     $hasAppointments = isset($appointments[$dateKey]);
                 @endphp
+                <div
 
-                <div style="
-                    border:1px solid #e2e8f0;
+                @if($hasAppointments)
+                    onclick="openCalendarDay('{{ $dateKey }}')"
+                @endif
+
+                style="
+                    border:1px solid {{ $hasAppointments ? '#60a5fa' : '#e2e8f0' }};
                     border-radius:8px;
                     padding:10px;
                     min-height:60px;
                     text-align:center;
                     background: {{ $hasAppointments ? '#dbeafe' : 'white' }};
-                    cursor:pointer;
-                ">
+                    cursor:{{ $hasAppointments ? 'pointer' : 'default' }};
+                    transition:.15s;
+                "
+                >
 
                     <div style="font-weight:600;">
                         {{ $day->day }}
@@ -990,6 +997,61 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 </div>
 
+        <div id="calendarDayModal" style="
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.4);
+            justify-content:center;
+            align-items:center;
+            z-index:10000;
+        ">
+
+            <div style="
+                background:white;
+                width:90%;
+                max-width:650px;
+                border-radius:12px;
+                padding:20px;
+                max-height:80vh;
+                overflow:auto;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                ">
+
+                    <h2 id="calendarDayTitle" style="margin:0;">
+                        Appointments
+                    </h2>
+
+                    <button class="btn" onclick="closeCalendarDay()">
+                        Close
+                    </button>
+
+                </div>
+
+                <hr>
+
+                <div id="calendarDayContent">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+<script>
+
+const calendarAppointments = @json($appointments);
+
+</script>
+
+
 <script>
 function openCalendar() {
     document.getElementById('calendarModal').style.display = 'flex';
@@ -998,4 +1060,100 @@ function openCalendar() {
 function closeCalendar() {
     document.getElementById('calendarModal').style.display = 'none';
 }
+
+
+function openCalendarDay(date)
+{
+
+
+
+    const modal = document.getElementById('calendarDayModal');
+
+    const title = document.getElementById('calendarDayTitle');
+
+    const content = document.getElementById('calendarDayContent');
+
+    title.innerHTML = "Appointments - " + date;
+
+    const appointments = calendarAppointments[date] || [];
+
+    let html = "";
+
+        appointments.forEach(function(appointment){
+
+        // alert(JSON.stringify(appointments[0], null, 2));
+
+
+            const appointmentTime = new Date(appointment.appointment_date);
+
+            const time = appointmentTime.toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+
+            html += `
+                <div style="
+                    border:1px solid #e2e8f0;
+                    border-radius:10px;
+                    padding:15px;
+                    margin-bottom:12px;
+                ">
+
+                    <div style="
+                        font-size:18px;
+                        font-weight:700;
+                        margin-bottom:6px;
+                    ">
+                        <a
+                            href="/patients/${appointment.patient.id}"
+                            style="
+                                color:#2563eb;
+                                text-decoration:none;
+                            "
+                        >
+                            ${appointment.patient.first_name} ${appointment.patient.last_name}
+                        </a>
+                    </div>
+
+                    <div style="color:#64748b;">
+                        🕒 ${time}
+                    </div>
+
+                    <div style="margin-top:6px;">
+                        ${appointment.purpose ?? "General Consultation"}
+                    </div>
+
+                    <div style="
+                        margin-top:10px;
+                        display:inline-block;
+                        padding:4px 10px;
+                        background:#eff6ff;
+                        border-radius:999px;
+                        font-size:13px;
+                        color:#2563eb;
+                    ">
+                        ${appointment.status}
+                    </div>
+
+                </div>
+            `;
+
+        });
+
+    if(html === "")
+    {
+        html = "No appointments.";
+    }
+
+    content.innerHTML = html;
+
+    modal.style.display = "flex";
+}
+
+function closeCalendarDay()
+{
+    document.getElementById("calendarDayModal").style.display = "none";
+}
+
+
 </script>

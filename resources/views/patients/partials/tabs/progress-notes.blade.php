@@ -435,7 +435,7 @@
 
 
 
-
+<!--
 
 {{-- ===================================================== --}}
 {{-- HISTORY (PROGRESS + BILLING SOURCE) --}}
@@ -596,6 +596,12 @@
 
 {{ $invoices->links('pagination::simple-default') }}
 </div>
+
+
+-->
+
+
+
 <script>
 
 

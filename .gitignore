@@ -5,6 +5,10 @@
 /public/storage
 /storage/*.key
 /vendor
+
+/storage/licensing/*
+!/storage/licensing/.gitkeep
+
 .env
 .env.backup
 .env.production

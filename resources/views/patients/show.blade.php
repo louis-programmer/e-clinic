@@ -20,6 +20,8 @@ $canAppointments = auth()->user()->canAccess('appointments');
 
 $canDentalDiagram = auth()->user()->canAccess('dental_diagram');
 
+$canInvoices= auth()->user()->canAccess('invoices');
+
 @endphp
 
 
@@ -301,6 +303,12 @@ $canDentalDiagram = auth()->user()->canAccess('dental_diagram');
             </button>
          @endif   
 
+          @if($canInvoices)
+             <button class="tab-btn" data-tab="invoices">
+                Invoices
+            </button>
+         @endif   
+
 <!-- hidden for production | for dev -->
 <!--
          <button class="tab-btn" data-tab="notes2">
@@ -391,6 +399,17 @@ $canDentalDiagram = auth()->user()->canAccess('dental_diagram');
         @include('patients.partials.tabs.encounters')
 
     </div>
+
+
+        {{-- PATIENT TIMELINE --}}
+            <div id="invoices"
+                 class="tab-content"
+                 style="display:none;">
+
+                @include('patients.partials.tabs.invoices')
+
+            </div>
+
 
 
 

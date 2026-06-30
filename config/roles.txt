@@ -1,0 +1,94 @@
+<?php
+?>
+<!--
+return [
+
+    #'scan_access' => ['admin', 'staff'],
+
+   
+   
+    
+    
+   
+    
+    /// Invoice and payment
+   
+   /* 
+    'invoice_view' => ['admin', 'staff', 'doctor'],
+	'invoice_create' => ['admin', 'staff'],
+	'invoice_update' => ['admin'],
+	'invoice_delete' => ['admin'],
+    
+    */
+
+    /*
+
+
+|--------------------------------------------------------------------------
+| Patient View Tabs
+|--------------------------------------------------------------------------
+*/
+ 'patient_view' => ['admin', 'staff', 'doctor'], // patient page / index/ viewer
+
+
+ 'patient_manage' => ['admin'], // appointments , editing 
+    'appointments'      => ['admin', 'staff', 'doctor'], // appointments
+
+#'overview_history'  => ['admin', 'staff', 'doctor'],
+'overview_history' => ['admin', 'staff', 'doctor'], // Progress/Patient notes
+
+#'progress_notes'    => ['admin', 'staff', 'doctor'],
+'progress_notes' => ['admin', 'staff', 'doctor'], // Progress/Patient notes
+
+#'patient_photos'    => ['admin', 'staff', 'doctor'],
+ 'patient_photos' => ['admin', 'staff', 'doctor'], // Photos
+
+'patient_xrays'     => ['admin', 'staff', 'doctor'],
+
+'patient_forms'     => ['admin', 'staff', 'doctor'],
+
+'dental_diagram'    => ['admin', 'staff', 'doctor'],
+
+'invoices'    => ['admin', 'staff', 'doctor'],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    'dashboard_statistics' => ['admin', 'staff', 'doctor'], // general dashboard
+
+    'dashboard_financial' => ['admin'],
+
+   'dashboard_reports' => ['admin'],
+
+
+    
+	/// Currently "Progress Notes " 
+    'encounter_view' => ['admin', 'staff', 'doctor'],
+    'encounter_manage' => ['admin', 'staff'],
+    'encounter_delete' => ['admin'],
+
+
+
+    //// clinic settings
+    #'clinic_profile_view' => ['admin', 'staff'],
+
+    'clinic_profile_manage' => ['admin'],
+
+    #'clinic_payment_settings' => ['admin'],
+
+
+    'user_manage' => ['admin'],
+
+];
+
+
+-->
+
+<?php
+
+
+return require storage_path('app/public/roles.php');
